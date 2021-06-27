@@ -2,6 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
+import FootBar from '../components/navbar/footbar';
+
+// Icons imports
+import CallIcon from '@material-ui/icons/CallEnd';
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import ChatIcon from '@material-ui/icons/Chat';
+import { CircularProgress } from '@material-ui/core';
 
 const Container = styled.div`
     padding: 20px;
@@ -44,6 +54,15 @@ const Room = (props) => {
     const peersRef = useRef([]);
     const roomID = props.match.params.roomID;
 
+    //beta 1
+    const [micStatus, setMicStatus] = useState(true);
+    const [camStatus, setCamStatus] = useState(true);
+    const [streaming, setStreaming] = useState(false);
+    const [chatToggle, setChatToggle] = useState(false);
+    const [userDetails, setUserDetails] = useState(null);
+    const [displayStream, setDisplayStream] = useState(false);
+    const [messages, setMessages] = useState([]);
+
     useEffect(() => {
         socketRef.current = io.connect("/");
         navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
@@ -57,7 +76,10 @@ const Room = (props) => {
                         peerID: userID,
                         peer,
                     })
-                    peers.push(peer);
+                    peers.push({
+                        peerID: userID,
+                        peer,
+                    });
                 })
                 setPeers(peers);
             })
@@ -69,13 +91,28 @@ const Room = (props) => {
                     peer,
                 })
 
-                setPeers(users => [...users, peer]);
+                const peerObj = {
+                    peer,
+                    peerID: payload.callerID
+                }
+                const peers = peersRef.current.filter(p => p.peerID !== payload.callerID);
+                setPeers([...peers, peerObj]);
             });
 
             socketRef.current.on("receiving returned signal", payload => {
                 const item = peersRef.current.find(p => p.peerID === payload.id);
                 item.peer.signal(payload.signal);
             });
+
+            socketRef.current.on("user left", id => {
+                const peerObj = peersRef.current.find(p => p.peerID === id);
+                if(peerObj) {
+                    peerObj.peer.destroy();
+                }
+                const peers = peersRef.current.filter(p => p.peerID !== id);
+                peersRef.current = peers;
+                setPeers(peers);
+            })
         })
     }, []);
 
@@ -109,15 +146,67 @@ const Room = (props) => {
         return peer;
     }
 
+    // const handleMyMic = () => {
+    //     const { getMyVideo, reInitializeStream } = socketInstance.current;
+    //     if (userVideo) userVideo.srcObject?.getAudioTracks().forEach((track) => {
+    //         if (track.kind === 'audio')
+    //             // track.enabled = !micStatus;
+    //             micStatus ? track.stop() : reInitializeStream(camStatus, !micStatus);
+    //     });
+    //     setMicStatus(!micStatus);
+    // }
+
+    function muteMic() {
+        userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+        setMicStatus(!micStatus);
+    }
+
+    function muteCam() {
+        userVideo.current.srcObject.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+        setCamStatus(!camStatus);
+    }
+
     return (
         <Container>
+            <div id="room-container"></div>
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
             {peers.map((peer, index) => {
                 return (
-                    <Video key={index} peer={peer} />
+                    <Video key={peer.peerID} peer={peer.peer} />
                 );
             })}
+            <FootBar className="chat-footbar">
+            <div className="footbar-title">Vi CHAT</div>
+                <div className="footbar-wrapper">
+                    { <div className="status-action-btn mic-btn" onClick={muteMic} title={micStatus ? 'Disable Mic' : 'Enable Mic'}>
+                        {micStatus ? 
+                            <MicIcon></MicIcon>
+                            :
+                            <MicOffIcon></MicOffIcon>
+                        }
+                    </div>}
+                    <div className="status-action-btn end-call-btn" title="End Call">
+                        <CallIcon></CallIcon>
+                    </div>
+                    {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}>
+                        {camStatus ? 
+                            <VideocamIcon></VideocamIcon>
+                            :
+                            <VideocamOffIcon></VideocamOffIcon>
+                        }
+                    </div>}
+                </div>
+                <div>
+                    <div className="screen-share-btn">
+                        <h4 className="screen-share-btn-text">{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
+                    </div>
+                    <div  className="chat-btn" title="Chat">
+                        <ChatIcon></ChatIcon>
+                    </div>
+                </div>
+            </FootBar>
         </Container>
+        
     );
 };
 
