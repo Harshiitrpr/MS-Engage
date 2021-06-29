@@ -8,7 +8,13 @@ const CreateRoom = (props) => {
     }
 
     return (
-        <button onClick={create}>Create room</button>
+        <div>
+            <section><button onClick={create}>Create room</button></section>
+            <section>
+                
+            </section>
+        </div>
+        
     );
 };
 

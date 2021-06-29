@@ -4,6 +4,9 @@ import Peer from "simple-peer";
 import styled from "styled-components";
 import FootBar from '../components/navbar/footbar';
 
+//material ui
+import {FormHelperText,  FormControl, Select, Button, TextField, InputLabel, MenuItem} from '@material-ui/core';
+
 // Icons imports
 import CallIcon from '@material-ui/icons/CallEnd';
 import MicIcon from '@material-ui/icons/Mic';
@@ -48,15 +51,24 @@ const videoConstraints = {
 };
 
 const Room = (props) => {
+    console.log(props.match);
     const [peers, setPeers] = useState([]);
     const socketRef = useRef();
     const userVideo = useRef();
+    const userStream = useRef();
     const peersRef = useRef([]);
     const roomID = props.match.params.roomID;
 
-    //beta 1
+    //~beta 1~ alpha
     const [micStatus, setMicStatus] = useState(true);
     const [camStatus, setCamStatus] = useState(true);
+
+    //~beta 2~ alpha
+    const [myName, setMyName] = useState("");
+    const [myVideo, setMyVideo] = useState("camera");
+    const [submited, setSubmited] = useState(false);
+
+    //beta 3
     const [streaming, setStreaming] = useState(false);
     const [chatToggle, setChatToggle] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
@@ -64,57 +76,68 @@ const Room = (props) => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        socketRef.current = io.connect("/");
-        navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
-            userVideo.current.srcObject = stream;
-            socketRef.current.emit("join room", roomID);
-            socketRef.current.on("all users", users => {
-                const peers = [];
-                users.forEach(userID => {
-                    const peer = createPeer(userID, socketRef.current.id, stream);
+        if(submited){
+            socketRef.current = io.connect("/");
+            console.log(myVideo);
+            const media = (myVideo === "camera") ? navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true })
+            : navigator.mediaDevices.getDisplayMedia()
+            media.then(stream => {
+                userVideo.current.srcObject = stream;
+                userStream.current = stream;
+    
+                socketRef.current.emit("join room", roomID);
+                socketRef.current.on("all users", users => {
+                    const peers = [];
+                    users.forEach(userID => {
+                        const peer = createPeer(userID, socketRef.current.id, stream);
+                        peersRef.current.push({
+                            peerID: userID,
+                            name: myName,
+                            peer,
+                        })
+                        peers.push({
+                            peerID: userID,
+                            name: myName,
+                            peer,
+                        });
+                    })
+                    setPeers(peers);
+                })
+    
+                socketRef.current.on("user joined", payload => {
+                    const peer = addPeer(payload.signal, payload.callerID, stream);
                     peersRef.current.push({
-                        peerID: userID,
+                        peerID: payload.callerID,
+                        name: myName,
                         peer,
                     })
-                    peers.push({
-                        peerID: userID,
+    
+                    const peerObj = {
                         peer,
-                    });
-                })
-                setPeers(peers);
-            })
-
-            socketRef.current.on("user joined", payload => {
-                const peer = addPeer(payload.signal, payload.callerID, stream);
-                peersRef.current.push({
-                    peerID: payload.callerID,
-                    peer,
-                })
-
-                const peerObj = {
-                    peer,
-                    peerID: payload.callerID
-                }
-                const peers = peersRef.current.filter(p => p.peerID !== payload.callerID);
-                setPeers([...peers, peerObj]);
+                        name: myName,
+                        peerID: payload.callerID
+                    }
+                    const peers = peersRef.current.filter(p => p.peerID !== payload.callerID);
+                    setPeers([...peers, peerObj]);
+                });
+    
+                socketRef.current.on("receiving returned signal", payload => {
+                    const item = peersRef.current.find(p => p.peerID === payload.id);
+                    item.peer.signal(payload.signal);
+                });
+    
+                socketRef.current.on("user left", id => {
+                    const peerObj = peersRef.current.find(p => p.peerID === id);
+                    if(peerObj) {
+                        peerObj.peer.destroy();
+                    }
+                    const peers = peersRef.current.filter(p => p.peerID !== id);
+                    peersRef.current = peers;
+                    setPeers(peers);
+                });
             });
-
-            socketRef.current.on("receiving returned signal", payload => {
-                const item = peersRef.current.find(p => p.peerID === payload.id);
-                item.peer.signal(payload.signal);
-            });
-
-            socketRef.current.on("user left", id => {
-                const peerObj = peersRef.current.find(p => p.peerID === id);
-                if(peerObj) {
-                    peerObj.peer.destroy();
-                }
-                const peers = peersRef.current.filter(p => p.peerID !== id);
-                peersRef.current = peers;
-                setPeers(peers);
-            })
-        })
-    }, []);
+        }
+    }, [submited]);
 
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
@@ -146,16 +169,6 @@ const Room = (props) => {
         return peer;
     }
 
-    // const handleMyMic = () => {
-    //     const { getMyVideo, reInitializeStream } = socketInstance.current;
-    //     if (userVideo) userVideo.srcObject?.getAudioTracks().forEach((track) => {
-    //         if (track.kind === 'audio')
-    //             // track.enabled = !micStatus;
-    //             micStatus ? track.stop() : reInitializeStream(camStatus, !micStatus);
-    //     });
-    //     setMicStatus(!micStatus);
-    // }
-
     function muteMic() {
         userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = !track.enabled);
         setMicStatus(!micStatus);
@@ -166,13 +179,20 @@ const Room = (props) => {
         setCamStatus(!camStatus);
     }
 
+    if(submited)
     return (
         <Container>
-            <div id="room-container"></div>
+            <div id="room-container">
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
+            <div>{myName}</div>
+            </div>
+            {/* { displayStream && <StyledVideo muted ref={userScreen} autoPlay playsInline />  } */}
             {peers.map((peer, index) => {
                 return (
+                    <section>
                     <Video key={peer.peerID} peer={peer.peer} />
+                    <div>{peer.name}</div>
+                    </section>
                 );
             })}
             <FootBar className="chat-footbar">
@@ -186,7 +206,7 @@ const Room = (props) => {
                         }
                     </div>}
                     <div className="status-action-btn end-call-btn" title="End Call">
-                        <CallIcon></CallIcon>
+                        <CallIcon onClick= {() => {window.open('', '_self', ''); window.close();}}></CallIcon>
                     </div>
                     {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}>
                         {camStatus ? 
@@ -198,7 +218,7 @@ const Room = (props) => {
                 </div>
                 <div>
                     <div className="screen-share-btn">
-                        <h4 className="screen-share-btn-text">{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
+                        <h4 className="screen-share-btn-text" >{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
                     </div>
                     <div  className="chat-btn" title="Chat">
                         <ChatIcon></ChatIcon>
@@ -208,6 +228,25 @@ const Room = (props) => {
         </Container>
         
     );
+    else{
+        return <FormControl>
+            <TextField label= "Enter your name" value={myName} onChange={(e) => setMyName(e.target.value)} />
+            {/* <InputLabel id="videoType">Age</InputLabel> */}
+            <Select
+            labelId="videoType"
+            id="videoType-select"
+            value={myVideo}
+            onChange={(e) => setMyVideo(e.target.value)}
+            >
+            <MenuItem value="screen">Share Screen</MenuItem>
+            <MenuItem value="camera">Use Camera</MenuItem>
+            </Select>
+            <Button variant="contained" color="primary" onClick={() =>{setSubmited(true)}}>
+                Join meeting
+                {console.log(submited)}
+            </Button>
+        </FormControl>
+    }
 };
 
 export default Room;
