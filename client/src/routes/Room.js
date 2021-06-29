@@ -6,6 +6,7 @@ import FootBar from '../components/navbar/footbar';
 
 //material ui
 import {FormHelperText,  FormControl, Select, Button, TextField, InputLabel, MenuItem} from '@material-ui/core';
+import {Drawer, IconButton, Divider} from '@material-ui/core';
 
 // Icons imports
 import CallIcon from '@material-ui/icons/CallEnd';
@@ -14,6 +15,8 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import SendIcon from '@material-ui/icons/Send';
 import { CircularProgress } from '@material-ui/core';
 
 const Container = styled.div`
@@ -51,7 +54,7 @@ const videoConstraints = {
 };
 
 const Room = (props) => {
-    console.log(props.match);
+    // console.log(props.match);
     const [peers, setPeers] = useState([]);
     const socketRef = useRef();
     const userVideo = useRef();
@@ -69,16 +72,19 @@ const Room = (props) => {
     const [submited, setSubmited] = useState(false);
 
     //beta 3
+    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState("");
+    const [chatBoxVisible, setChatBoxVisible] = useState(false);
     const [streaming, setStreaming] = useState(false);
     const [chatToggle, setChatToggle] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
     const [displayStream, setDisplayStream] = useState(false);
-    const [messages, setMessages] = useState([]);
+    // const [messages, setMessages] = useState([]);
 
     useEffect(() => {
         if(submited){
             socketRef.current = io.connect("/");
-            console.log(myVideo);
+            // console.log(myVideo);
             const media = (myVideo === "camera") ? navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true })
             : navigator.mediaDevices.getDisplayMedia()
             media.then(stream => {
@@ -179,6 +185,54 @@ const Room = (props) => {
         setCamStatus(!camStatus);
     }
 
+    const messageInput = document.getElementById("message-input");
+
+    const sendMessage = (e)=> {
+        console.log("sendMessage called");
+        e.preventDefault();
+        if(message !== ""){
+            let messageDetail = {message: message, sender: myName, timestamp: new Date(), senderId:socketRef.current.id };            
+            setMessage("");
+            setMessages([...messages, messageDetail]);
+        }
+        return false;
+    }
+
+    const handleOpenChatBox = () => {
+        setChatBoxVisible(true);
+    }
+
+    const handleCloseChatBox = () => {
+        setChatBoxVisible(false);
+    }
+
+    function getMessageDateOrTime(date) {
+        if (date !== null) {
+            const dateObj = new Date(date);
+            const dateDetails = {
+                date: dateObj.getDate(),
+                month: dateObj.getMonth() + 1,
+                year: dateObj.getFullYear(),
+                hour: dateObj.getHours(),
+                minutes: dateObj.getMinutes()
+            }
+            const currentDateObj = new Date();
+            const currentDateDetails = {
+                date: currentDateObj.getDate(),
+                month: currentDateObj.getMonth() + 1,
+                year: currentDateObj.getFullYear(),
+                hour: currentDateObj.getHours(),
+                minutes: currentDateObj.getMinutes()
+            }
+            if (dateDetails.year !== currentDateDetails.year && dateDetails.month !== currentDateDetails.month && dateDetails.date !== currentDateDetails.date) {
+                return dateDetails.date + '-' + dateDetails.month + '-' + dateDetails.year;
+            } else {
+                return dateDetails.hour + ':' + dateDetails.minutes + ` ${dateDetails.hour < 12 ? 'AM' : 'PM'}`
+            }
+        }
+        return '';
+    }
+
     if(submited)
     return (
         <Container>
@@ -220,11 +274,52 @@ const Room = (props) => {
                     <div className="screen-share-btn">
                         <h4 className="screen-share-btn-text" >{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
                     </div>
-                    <div  className="chat-btn" title="Chat">
+                    <div  className="chat-btn" title="Chat" onClick={handleOpenChatBox}>
                         <ChatIcon></ChatIcon>
                     </div>
                 </div>
             </FootBar>
+            <Drawer
+                // className={classes.drawer}
+                variant="persistent"
+                anchor="right"
+                open={chatBoxVisible}
+                // classes={{
+                //     paper: classes.drawerPaper,
+                // }}
+            >
+                <div>
+                    <IconButton onClick={handleCloseChatBox}>
+                        <ChevronRightIcon />
+                    </IconButton>
+                </div>
+                <Divider />
+                <div className="chat-drawer-list">
+                    {
+                        messages?.map((chatDetails, index) => {
+                            const { sender, message, timestamp, senderId } = chatDetails;
+                            return (
+                                <div key={index + senderId} className="message-container">
+                                    <div className={`message-wrapper ${senderId === socketRef.current.id ? 'message-wrapper-right' : ''}`}>
+                                        <div className="message-title-wrapper">
+                                            <h5 className="message-name">{sender}</h5>
+                                            <span className="message-timestamp">{getMessageDateOrTime(timestamp)}</span>
+                                        </div>
+                                        <p className="actual-message">{message}</p>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+                <Divider />
+                <div>
+                    <form  noValidate autoComplete="off">
+                    <TextField id="chat-input" label="Type Here" value= {message} onChange={(e) => {setMessage(e.target.value)}} />
+                    <SendIcon onClick={sendMessage}/>
+                    </form>
+                </div>
+            </Drawer>
         </Container>
         
     );
@@ -233,17 +328,16 @@ const Room = (props) => {
             <TextField label= "Enter your name" value={myName} onChange={(e) => setMyName(e.target.value)} />
             {/* <InputLabel id="videoType">Age</InputLabel> */}
             <Select
-            labelId="videoType"
-            id="videoType-select"
-            value={myVideo}
-            onChange={(e) => setMyVideo(e.target.value)}
+                labelId="videoType"
+                id="videoType-select"
+                value={myVideo}
+                onChange={(e) => setMyVideo(e.target.value)}
             >
             <MenuItem value="screen">Share Screen</MenuItem>
             <MenuItem value="camera">Use Camera</MenuItem>
             </Select>
             <Button variant="contained" color="primary" onClick={() =>{setSubmited(true)}}>
                 Join meeting
-                {console.log(submited)}
             </Button>
         </FormControl>
     }
