@@ -71,14 +71,14 @@ const Room = (props) => {
     const [myVideo, setMyVideo] = useState("camera");
     const [submited, setSubmited] = useState(false);
 
-    //beta 3
+    //~beta 3~ alpha
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [chatBoxVisible, setChatBoxVisible] = useState(false);
-    const [streaming, setStreaming] = useState(false);
-    const [chatToggle, setChatToggle] = useState(false);
-    const [userDetails, setUserDetails] = useState(null);
-    const [displayStream, setDisplayStream] = useState(false);
+    // const [streaming, setStreaming] = useState(false);
+    // const [chatToggle, setChatToggle] = useState(false);
+    // const [userDetails, setUserDetails] = useState(null);
+    // const [displayStream, setDisplayStream] = useState(false);
     // const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -91,59 +91,83 @@ const Room = (props) => {
                 userVideo.current.srcObject = stream;
                 userStream.current = stream;
     
-                socketRef.current.emit("join room", roomID);
+                socketRef.current.emit("join room", roomID, myName);
                 socketRef.current.on("all users", users => {
                     const peers = [];
-                    users.forEach(userID => {
-                        const peer = createPeer(userID, socketRef.current.id, stream);
+                    users.forEach(({id, name}) => {
+                        const peer = createPeer(id, socketRef.current.id, stream);
                         peersRef.current.push({
-                            peerID: userID,
-                            name: myName,
+                            peerID: id,
+                            name: name,
                             peer,
                         })
                         peers.push({
-                            peerID: userID,
-                            name: myName,
+                            peerID: id,
+                            name: name,
                             peer,
                         });
                     })
                     setPeers(peers);
+                    console.log(peers);
                 })
     
                 socketRef.current.on("user joined", payload => {
+                    console.log("user joined");
+                    console.log(payload);
                     const peer = addPeer(payload.signal, payload.callerID, stream);
                     peersRef.current.push({
                         peerID: payload.callerID,
-                        name: myName,
+                        name: payload.callerName,
                         peer,
                     })
     
                     const peerObj = {
                         peer,
-                        name: myName,
+                        name: payload.callerName,
                         peerID: payload.callerID
                     }
                     const peers = peersRef.current.filter(p => p.peerID !== payload.callerID);
                     setPeers([...peers, peerObj]);
                 });
     
-                socketRef.current.on("receiving returned signal", payload => {
-                    const item = peersRef.current.find(p => p.peerID === payload.id);
-                    item.peer.signal(payload.signal);
+                socketRef.current.on("receiving returned signal", (signal, id) => {
+                    const item = peersRef.current.find(p => p.peerID === id);
+                    item.peer.signal(signal);
                 });
-    
+
                 socketRef.current.on("user left", id => {
                     const peerObj = peersRef.current.find(p => p.peerID === id);
                     if(peerObj) {
                         peerObj.peer.destroy();
                     }
+                    console.log("before removing");
                     const peers = peersRef.current.filter(p => p.peerID !== id);
                     peersRef.current = peers;
                     setPeers(peers);
+                    console.log("after removing");
                 });
+
+                socketRef.current.on("receiving message", messageDetail => {
+                    console.log("client recieved message");
+                    messages.push(messageDetail);
+                    setMessages([...messages]);
+                    console.log(messages);
+                })
             });
         }
+        else{
+            console.log(localStorage.getItem("sharescreen"));
+            if(localStorage.getItem("sharescreen")){
+                setMyName(localStorage.getItem("myName"));
+                setMyVideo("screen");
+                localStorage.removeItem("myName");
+                localStorage.removeItem("sharescreen");
+                setSubmited(true);
+            }
+        }
     }, [submited]);
+
+    
 
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
@@ -153,7 +177,7 @@ const Room = (props) => {
         });
 
         peer.on("signal", signal => {
-            socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
+            socketRef.current.emit("sending signal", userToSignal, callerID, signal, myName )
         })
 
         return peer;
@@ -167,7 +191,7 @@ const Room = (props) => {
         })
 
         peer.on("signal", signal => {
-            socketRef.current.emit("returning signal", { signal, callerID })
+            socketRef.current.emit("returning signal",  signal, callerID, myName )
         })
 
         peer.signal(incomingSignal);
@@ -185,15 +209,29 @@ const Room = (props) => {
         setCamStatus(!camStatus);
     }
 
-    const messageInput = document.getElementById("message-input");
+    const shareScreen = () => {
+        console.log("screen share clicked");
+        if(myVideo === "camera"){
+            console.log("local storage me save ho gya");
+            const url = "http://localhost:3000/room/" + roomID;
+            localStorage.setItem("sharescreen", true);
+            localStorage.setItem("myName", myName);
+            window.open(url, '_blank');
+        }
+        else{
+            window.close();
+        }
+        
+    }
 
     const sendMessage = (e)=> {
         console.log("sendMessage called");
         e.preventDefault();
         if(message !== ""){
-            let messageDetail = {message: message, sender: myName, timestamp: new Date(), senderId:socketRef.current.id };            
+            const messageDetail = {message: message, sender: myName, timestamp: new Date(), senderId:socketRef.current.id };   
+            socketRef.current.emit("sending message", messageDetail);
             setMessage("");
-            setMessages([...messages, messageDetail]);
+            // setMessages([...messages, messageDetail]);
         }
         return false;
     }
@@ -204,6 +242,11 @@ const Room = (props) => {
 
     const handleCloseChatBox = () => {
         setChatBoxVisible(false);
+    }
+
+    const handleEndCall = () => {
+        console.log("emmiting end call");
+        socketRef.current.emit("disconnect");
     }
 
     function getMessageDateOrTime(date) {
@@ -240,11 +283,11 @@ const Room = (props) => {
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
             <div>{myName}</div>
             </div>
-            {/* { displayStream && <StyledVideo muted ref={userScreen} autoPlay playsInline />  } */}
-            {peers.map((peer, index) => {
+            {console.log(peers)}
+            {peers.map((peer) => {
                 return (
-                    <section>
-                    <Video key={peer.peerID} peer={peer.peer} />
+                    <section key={peer.peerID}>
+                    <Video peer={peer.peer} />
                     <div>{peer.name}</div>
                     </section>
                 );
@@ -260,7 +303,7 @@ const Room = (props) => {
                         }
                     </div>}
                     <div className="status-action-btn end-call-btn" title="End Call">
-                        <CallIcon onClick= {() => {window.open('', '_self', ''); window.close();}}></CallIcon>
+                        <CallIcon onClick= {handleEndCall}></CallIcon>
                     </div>
                     {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}>
                         {camStatus ? 
@@ -272,7 +315,7 @@ const Room = (props) => {
                 </div>
                 <div>
                     <div className="screen-share-btn">
-                        <h4 className="screen-share-btn-text" >{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
+                        <h4 className="screen-share-btn-text" onClick={shareScreen} >{myVideo === "screen" ? 'Stop Screen Share' : 'Share Screen'}</h4>
                     </div>
                     <div  className="chat-btn" title="Chat" onClick={handleOpenChatBox}>
                         <ChatIcon></ChatIcon>
@@ -314,9 +357,9 @@ const Room = (props) => {
                 </div>
                 <Divider />
                 <div>
-                    <form  noValidate autoComplete="off">
-                    <TextField id="chat-input" label="Type Here" value= {message} onChange={(e) => {setMessage(e.target.value)}} />
-                    <SendIcon onClick={sendMessage}/>
+                    <form  noValidate autoComplete="off" onSubmit={sendMessage}>
+                        <TextField id="chat-input" label="Type Here" value= {message} onChange={(e) => {setMessage(e.target.value)}} />
+                        <button type = "submit" onSubmit={() => sendMessage}><SendIcon /></button>
                     </form>
                 </div>
             </Drawer>
