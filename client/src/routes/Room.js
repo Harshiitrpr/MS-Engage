@@ -71,14 +71,14 @@ const Room = (props) => {
     const [myVideo, setMyVideo] = useState("camera");
     const [submited, setSubmited] = useState(false);
 
-    //~beta 3~ alpha
+    //beta 3
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [chatBoxVisible, setChatBoxVisible] = useState(false);
-    // const [streaming, setStreaming] = useState(false);
-    // const [chatToggle, setChatToggle] = useState(false);
-    // const [userDetails, setUserDetails] = useState(null);
-    // const [displayStream, setDisplayStream] = useState(false);
+    const [streaming, setStreaming] = useState(false);
+    const [chatToggle, setChatToggle] = useState(false);
+    const [userDetails, setUserDetails] = useState(null);
+    const [displayStream, setDisplayStream] = useState(false);
     // const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -94,69 +94,63 @@ const Room = (props) => {
                 socketRef.current.emit("join room", roomID, myName);
                 socketRef.current.on("all users", users => {
                     const peers = [];
-                    users.forEach(({id, name}) => {
-                        const peer = createPeer(id, socketRef.current.id, stream);
+                    users.forEach(user => {
+                        const peer = createPeer(user.id, socketRef.current.id, stream);
                         peersRef.current.push({
-                            peerID: id,
-                            name: name,
+                            peerID: user.id,
+                            name: user.name,
                             peer,
                         })
                         peers.push({
-                            peerID: id,
-                            name: name,
+                            peerID: user.id,
+                            name: user.name,
                             peer,
                         });
                     })
                     setPeers(peers);
-                    console.log(peers);
                 })
     
                 socketRef.current.on("user joined", payload => {
-                    console.log("user joined");
-                    console.log(payload);
                     const peer = addPeer(payload.signal, payload.callerID, stream);
                     peersRef.current.push({
                         peerID: payload.callerID,
-                        name: payload.callerName,
+                        name: payload.name,
                         peer,
                     })
     
                     const peerObj = {
                         peer,
-                        name: payload.callerName,
-                        peerID: payload.callerID
+                        name: payload.name,
+                        peerID: payload.callerID,
                     }
                     const peers = peersRef.current.filter(p => p.peerID !== payload.callerID);
                     setPeers([...peers, peerObj]);
                 });
     
-                socketRef.current.on("receiving returned signal", (signal, id) => {
-                    const item = peersRef.current.find(p => p.peerID === id);
-                    item.peer.signal(signal);
+                socketRef.current.on("receiving returned signal", payload => {
+                    const item = peersRef.current.find(p => p.peerID === payload.id);
+                    item.peer.signal(payload.signal);
                 });
-
+    
                 socketRef.current.on("user left", id => {
                     const peerObj = peersRef.current.find(p => p.peerID === id);
                     if(peerObj) {
                         peerObj.peer.destroy();
                     }
-                    console.log("before removing");
                     const peers = peersRef.current.filter(p => p.peerID !== id);
                     peersRef.current = peers;
                     setPeers(peers);
-                    console.log("after removing");
                 });
 
                 socketRef.current.on("receiving message", messageDetail => {
-                    console.log("client recieved message");
+                    // console.log("client recieved message");
                     messages.push(messageDetail);
                     setMessages([...messages]);
-                    console.log(messages);
+                    // console.log(messages);
                 })
             });
         }
         else{
-            console.log(localStorage.getItem("sharescreen"));
             if(localStorage.getItem("sharescreen")){
                 setMyName(localStorage.getItem("myName"));
                 setMyVideo("screen");
@@ -167,8 +161,6 @@ const Room = (props) => {
         }
     }, [submited]);
 
-    
-
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
             initiator: true,
@@ -177,7 +169,7 @@ const Room = (props) => {
         });
 
         peer.on("signal", signal => {
-            socketRef.current.emit("sending signal", userToSignal, callerID, signal, myName )
+            socketRef.current.emit("sending signal", { userToSignal, callerID, signal, name:myName })
         })
 
         return peer;
@@ -191,7 +183,7 @@ const Room = (props) => {
         })
 
         peer.on("signal", signal => {
-            socketRef.current.emit("returning signal",  signal, callerID, myName )
+            socketRef.current.emit("returning signal", { signal, callerID })
         })
 
         peer.signal(incomingSignal);
@@ -212,7 +204,7 @@ const Room = (props) => {
     const shareScreen = () => {
         console.log("screen share clicked");
         if(myVideo === "camera"){
-            console.log("local storage me save ho gya");
+            // console.log("local storage me save ho gya");
             const url = "http://localhost:3000/room/" + roomID;
             localStorage.setItem("sharescreen", true);
             localStorage.setItem("myName", myName);
@@ -221,11 +213,10 @@ const Room = (props) => {
         else{
             window.close();
         }
-        
     }
 
     const sendMessage = (e)=> {
-        console.log("sendMessage called");
+        // console.log("sendMessage called");
         e.preventDefault();
         if(message !== ""){
             const messageDetail = {message: message, sender: myName, timestamp: new Date(), senderId:socketRef.current.id };   
@@ -283,7 +274,7 @@ const Room = (props) => {
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
             <div>{myName}</div>
             </div>
-            {console.log(peers)}
+            {/* { displayStream && <StyledVideo muted ref={userScreen} autoPlay playsInline />  } */}
             {peers.map((peer) => {
                 return (
                     <section key={peer.peerID}>
