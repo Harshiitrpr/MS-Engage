@@ -37,7 +37,7 @@ io.on('connection', socket => {
     });
 
     socket.on("sending message", messageDetail => {
-        // console.log("server recieved message");
+        console.log("server recieved message");
         io.emit("receiving message", messageDetail);
     })
 

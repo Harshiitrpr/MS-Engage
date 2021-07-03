@@ -3,10 +3,11 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
 import FootBar from '../components/navbar/footbar';
-
+import ChatBox from "../components/chat/chatBox";
 //material ui
 import {FormHelperText,  FormControl, Select, Button, TextField, InputLabel, MenuItem} from '@material-ui/core';
 import {Drawer, IconButton, Divider} from '@material-ui/core';
+import { ToastContainer, toast } from 'react-toastify';
 
 // Icons imports
 import CallIcon from '@material-ui/icons/CallEnd';
@@ -19,6 +20,8 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import SendIcon from '@material-ui/icons/Send';
 import { CircularProgress } from '@material-ui/core';
 
+// jsx of react-toastify
+import 'react-toastify/dist/ReactToastify.css';
 const Container = styled.div`
     padding: 20px;
     display: flex;
@@ -74,14 +77,15 @@ const Room = (props) => {
     //beta 3
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
-    const [chatBoxVisible, setChatBoxVisible] = useState(false);
-    const [streaming, setStreaming] = useState(false);
-    const [chatToggle, setChatToggle] = useState(false);
-    const [userDetails, setUserDetails] = useState(null);
-    const [displayStream, setDisplayStream] = useState(false);
+    const [chatBoxVisible, setChatBoxVisible] = useState(true);
+    // const [streaming, setStreaming] = useState(false);
+    // const [chatToggle, setChatToggle] = useState(false);
+    // const [userDetails, setUserDetails] = useState(null);
+    // const [displayStream, setDisplayStream] = useState(false);
     // const [messages, setMessages] = useState([]);
 
     useEffect(() => {
+        console.log("use effect is being called");
         if(submited){
             socketRef.current = io.connect("/");
             // console.log(myVideo);
@@ -90,7 +94,7 @@ const Room = (props) => {
             media.then(stream => {
                 userVideo.current.srcObject = stream;
                 userStream.current = stream;
-    
+
                 socketRef.current.emit("join room", roomID, myName);
                 socketRef.current.on("all users", users => {
                     const peers = [];
@@ -131,6 +135,15 @@ const Room = (props) => {
                     const item = peersRef.current.find(p => p.peerID === payload.id);
                     item.peer.signal(payload.signal);
                 });
+
+                socketRef.current.on("receiving message", messageDetail => {
+                    console.log("client recieved message");
+                    messages.push(messageDetail);
+                    notify(messageDetail);
+                    setMessages([...messages]);
+                    // console.log(messages);
+                })
+            
     
                 socketRef.current.on("user left", id => {
                     const peerObj = peersRef.current.find(p => p.peerID === id);
@@ -141,13 +154,6 @@ const Room = (props) => {
                     peersRef.current = peers;
                     setPeers(peers);
                 });
-
-                socketRef.current.on("receiving message", messageDetail => {
-                    // console.log("client recieved message");
-                    messages.push(messageDetail);
-                    setMessages([...messages]);
-                    // console.log(messages);
-                })
             });
         }
         else{
@@ -160,6 +166,24 @@ const Room = (props) => {
             }
         }
     }, [submited]);
+
+    const notify = async(messageDetail) => {
+        console.log(chatBoxVisible);
+        if(chatBoxVisible){
+            toast(<div>
+                <div>{messageDetail.sender}</div>
+                <div>{messageDetail.message}</div>
+            </div>, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            });
+        }
+    }
 
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
@@ -227,12 +251,10 @@ const Room = (props) => {
         return false;
     }
 
-    const handleOpenChatBox = () => {
-        setChatBoxVisible(true);
-    }
-
-    const handleCloseChatBox = () => {
-        setChatBoxVisible(false);
+    const handleChatButton = () => {
+        // console.log(chatBoxVisible);
+        setChatBoxVisible(!chatBoxVisible);
+        // console.log(chatBoxVisible)
     }
 
     const handleEndCall = () => {
@@ -272,6 +294,7 @@ const Room = (props) => {
         <Container>
             <div id="room-container">
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
+            {/* <ChatBox/> */}
             <div>{myName}</div>
             </div>
             {/* { displayStream && <StyledVideo muted ref={userScreen} autoPlay playsInline />  } */}
@@ -308,54 +331,33 @@ const Room = (props) => {
                     <div className="screen-share-btn">
                         <h4 className="screen-share-btn-text" onClick={shareScreen} >{myVideo === "screen" ? 'Stop Screen Share' : 'Share Screen'}</h4>
                     </div>
-                    <div  className="chat-btn" title="Chat" onClick={handleOpenChatBox}>
+                    <div  className="chat-btn" title="Chat" onClick={handleChatButton}>
                         <ChatIcon></ChatIcon>
                     </div>
                 </div>
             </FootBar>
-            <Drawer
-                // className={classes.drawer}
-                variant="persistent"
-                anchor="right"
-                open={chatBoxVisible}
-                // classes={{
-                //     paper: classes.drawerPaper,
-                // }}
-            >
-                <div>
-                    <IconButton onClick={handleCloseChatBox}>
-                        <ChevronRightIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <div className="chat-drawer-list">
-                    {
-                        messages?.map((chatDetails, index) => {
-                            const { sender, message, timestamp, senderId } = chatDetails;
-                            return (
-                                <div key={index + senderId} className="message-container">
-                                    <div className={`message-wrapper ${senderId === socketRef.current.id ? 'message-wrapper-right' : ''}`}>
-                                        <div className="message-title-wrapper">
-                                            <h5 className="message-name">{sender}</h5>
-                                            <span className="message-timestamp">{getMessageDateOrTime(timestamp)}</span>
-                                        </div>
-                                        <p className="actual-message">{message}</p>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                </div>
-                <Divider />
-                <div>
-                    <form  noValidate autoComplete="off" onSubmit={sendMessage}>
-                        <TextField id="chat-input" label="Type Here" value= {message} onChange={(e) => {setMessage(e.target.value)}} />
-                        <button type = "submit" onSubmit={() => sendMessage}><SendIcon /></button>
-                    </form>
-                </div>
-            </Drawer>
+            {/* <h1>Why this colaveri</h1> */}
+            <ChatBox 
+                chatBoxVisible = {chatBoxVisible} 
+                messages={messages} 
+                chatBoxVisible = {chatBoxVisible}
+                setChatBoxVisible = {setChatBoxVisible} 
+                socketRef= {socketRef}
+                myName= {myName}
+                messages= {messages}
+            />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss={false}
+                draggable={false}
+                pauseOnHover
+            />
         </Container>
-        
     );
     else{
         return <FormControl>
