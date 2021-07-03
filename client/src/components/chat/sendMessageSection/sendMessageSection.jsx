@@ -5,13 +5,11 @@ const SendMessageSection = () => {
     const [message, setMessage] = useState("");
 
     const sendMessage = (e)=> {
-        // console.log("sendMessage called");
         e.preventDefault();
         if(message !== ""){
             const messageDetail = {message: message, sender: props.myName, timestamp: new Date(), senderId: props.socketRef.current.id };   
             props.socketRef.current.emit("sending message", messageDetail);
             setMessage("");
-            // setMessages([...messages, messageDetail]);
         }
         return false;
     }
@@ -25,3 +23,5 @@ const SendMessageSection = () => {
         </div>
     )
 }
+
+export default SendMessageSection;
