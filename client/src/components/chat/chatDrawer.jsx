@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {Drawer, Divider} from '@material-ui/core';
 
 //sub components
@@ -6,11 +6,12 @@ import ChatHead from "./chat/chatHead/chatHead.jsx";
 import ChatWall from "./chat/chatWall/chatWall.jsx";
 import SendMessageSection from "./chat/sendMessageSection/sendMessageSection.jsx";
 
+// Toast notifications
+import MessageToast from "../notifications/messageToast";
+
 const ChatDrawer = (props) => {
-    const [message, setMessage] = useState("");
 
     return(
-        
         <Drawer
             // className={classes.drawer}
             variant="persistent"
@@ -25,6 +26,7 @@ const ChatDrawer = (props) => {
             <ChatWall messages={props.messages} id = {props.id}/>
             <Divider />
             <SendMessageSection socketRef= {props.socketRef}/>
+            <MessageToast/>
         </Drawer>
         
     )

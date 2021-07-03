@@ -1,6 +1,6 @@
 import { ToastContainer, toast } from 'react-toastify';
 
-export const toastMessage = async(messageDetail) => {
+export const notifyMessage = async(messageDetail) => {
     toast(<div>
         <div>{messageDetail.sender}</div>
         <div>{messageDetail.message}</div>
@@ -15,9 +15,7 @@ export const toastMessage = async(messageDetail) => {
     });
 }
 
-const messageToast = (props) => {
-    const {chatBoxVisible, messageDetail} = props;
-
+const MessageToast = (props) => {
     return(
         <ToastContainer
             newestOnTop
@@ -27,5 +25,5 @@ const messageToast = (props) => {
     )
 }
 
-export default messageToast;
+export default MessageToast;
 
