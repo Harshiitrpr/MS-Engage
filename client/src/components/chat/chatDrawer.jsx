@@ -23,9 +23,9 @@ const ChatDrawer = (props) => {
         >
             <ChatHead setChatBoxVisible = {props.setChatBoxVisible}/>
             <Divider />
-            <ChatWall messages={props.messages} id = {props.id}/>
+            <ChatWall messages={props.messages}/>
             <Divider />
-            <SendMessageSection socketRef= {props.socketRef}/>
+            <SendMessageSection socketRef= {props.socketRef} myName={props.myName}/>
             <MessageToast/>
         </Drawer>
         
