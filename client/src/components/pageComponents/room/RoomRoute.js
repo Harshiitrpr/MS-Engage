@@ -2,23 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
-import FootBar from '../components/navbar/footbar';
-import ChatBox from "../components/chat/chatBox";
+import UserDetailsBeforeJoining from "./userDetails";
+import FootConfigurationBar from '../../navbar/footbar';
+import ChatDrawer from "../../chat/chatDrawer";
 //material ui
-import {FormHelperText,  FormControl, Select, Button, TextField, InputLabel, MenuItem} from '@material-ui/core';
-import {Drawer, IconButton, Divider} from '@material-ui/core';
-import { ToastContainer, toast } from 'react-toastify';
 
-// Icons imports
-import CallIcon from '@material-ui/icons/CallEnd';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import VideocamIcon from '@material-ui/icons/Videocam';
-import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import ChatIcon from '@material-ui/icons/Chat';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import SendIcon from '@material-ui/icons/Send';
-import { CircularProgress } from '@material-ui/core';
+import { ToastContainer } from 'react-toastify';
 
 // jsx of react-toastify
 import 'react-toastify/dist/ReactToastify.css';
@@ -66,8 +55,7 @@ const Room = (props) => {
     const roomID = props.match.params.roomID;
 
     //~beta 1~ alpha
-    const [micStatus, setMicStatus] = useState(true);
-    const [camStatus, setCamStatus] = useState(true);
+    
 
     //~beta 2~ alpha
     const [myName, setMyName] = useState("");
@@ -75,7 +63,7 @@ const Room = (props) => {
     const [submited, setSubmited] = useState(false);
 
     //beta 3
-    const [messages, setMessages] = useState([]);
+    // const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [chatBoxVisible, setChatBoxVisible] = useState(true);
 
@@ -88,6 +76,7 @@ const Room = (props) => {
                 userVideo.current.srcObject = stream;
                 userStream.current = stream;
 
+                console.log(socketRef);
                 socketRef.current.emit("join room", roomID, myName);
                 socketRef.current.on("all users", users => {
                     const peers = [];
@@ -180,42 +169,7 @@ const Room = (props) => {
 
         return peer;
     }
-
-    function muteMic() {
-        userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = !track.enabled);
-        setMicStatus(!micStatus);
-    }
-
-    function muteCam() {
-        userVideo.current.srcObject.getVideoTracks().forEach(track => track.enabled = !track.enabled);
-        setCamStatus(!camStatus);
-    }
-
-    const shareScreen = () => {
-        console.log("screen share clicked");
-        if(myVideo === "camera"){
-            // console.log("local storage me save ho gya");
-            const url = "http://localhost:3000/room/" + roomID;
-            localStorage.setItem("sharescreen", true);
-            localStorage.setItem("myName", myName);
-            window.open(url, '_blank');
-        }
-        else{
-            window.close();
-        }
-    }
-
-    const handleChatButton = () => {
-        // console.log(chatBoxVisible);
-        setChatBoxVisible(!chatBoxVisible);
-        // console.log(chatBoxVisible)
-    }
-
-    const handleEndCall = () => {
-        console.log("emmiting end call");
-        socketRef.current.emit("disconnect");
-    }
-
+    
     if(submited)
     return (
         <Container>
@@ -223,6 +177,7 @@ const Room = (props) => {
                 <StyledVideo muted ref={userVideo} autoPlay playsInline />
                 <div>{myName}</div>
             </div>
+
             {peers.map((peer) => {
                 return (
                     <section key={peer.peerID}>
@@ -231,40 +186,19 @@ const Room = (props) => {
                     </section>
                 );
             })}
-            <FootBar className="chat-footbar">
-            <div className="footbar-title">Vi CHAT</div>
-                <div className="footbar-wrapper">
-                    { <div className="status-action-btn mic-btn" onClick={muteMic} title={micStatus ? 'Disable Mic' : 'Enable Mic'}>
-                        {micStatus ? 
-                            <MicIcon></MicIcon>
-                            :
-                            <MicOffIcon></MicOffIcon>
-                        }
-                    </div>}
-                    <div className="status-action-btn end-call-btn" title="End Call">
-                        <CallIcon onClick= {handleEndCall}></CallIcon>
-                    </div>
-                    {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}>
-                        {camStatus ? 
-                            <VideocamIcon></VideocamIcon>
-                            :
-                            <VideocamOffIcon></VideocamOffIcon>
-                        }
-                    </div>}
-                </div>
-                <div>
-                    <div className="screen-share-btn">
-                        <h4 className="screen-share-btn-text" onClick={shareScreen} >{myVideo === "screen" ? 'Stop Screen Share' : 'Share Screen'}</h4>
-                    </div>
-                    <div  className="chat-btn" title="Chat" onClick={handleChatButton}>
-                        <ChatIcon></ChatIcon>
-                    </div>
-                </div>
-            </FootBar>
-            <ChatDrawer
-                messages={messages} 
+
+            <FootConfigurationBar
+                socketRef={socketRef}
+                myVideo= {myVideo}
+                userVideo= {userVideo}
                 chatBoxVisible = {chatBoxVisible}
-                setChatBoxVisible = {setChatBoxVisible} 
+                setChatBoxVisible= {setChatBoxVisible}
+            />
+            <ChatDrawer
+                // messages={messages}
+                // setMessages={setMessages} 
+                chatBoxVisible = {chatBoxVisible}
+                setChatBoxVisible = {setChatBoxVisible}
                 socketRef= {socketRef}
                 myName= {myName}
             />
@@ -283,6 +217,8 @@ const Room = (props) => {
     );
     else{
         return <UserDetailsBeforeJoining
+            myName = {myName}
+            setMyName={setMyName}
             myVideo={myVideo}
             setMyVideo={setMyVideo}
             setSubmited= {setSubmited}

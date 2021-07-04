@@ -1,16 +1,21 @@
+import React, {useEffect, useState} from "react";
+
 //toast trigger
 import { notifyMessage as notify } from "../../notifications/messageToast";
+
 const ChatWall = (props) => {
-    const {messages, setMessages, socketRef} = props;
+    const { socketRef} = props;
+    const [messages, setMessages] = useState([]);
+    console.log(socketRef);
+
     useEffect(() => {
         socketRef.current.on("receiving message", messageDetail => {
             console.log("client recieved message");
             messages.push(messageDetail);
             notify(messageDetail);
             setMessages([...messages]);
-            // console.log(messages);
         })
-    },[])
+    }, [])
 
     function getMessageDateOrTime(date) {
         if (date !== null) {

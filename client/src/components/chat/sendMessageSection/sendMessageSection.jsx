@@ -1,7 +1,8 @@
+import React, {useState} from "react";
 import {IconButton, TextField} from "@material-ui/core";
 import SendIcon from '@material-ui/icons/Send';
 
-const SendMessageSection = () => {
+const SendMessageSection = (props) => {
     const [message, setMessage] = useState("");
 
     const sendMessage = (e)=> {

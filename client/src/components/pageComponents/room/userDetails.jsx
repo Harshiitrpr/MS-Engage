@@ -1,7 +1,8 @@
+import React from "react";
 import {FormControl, TextField, Select, MenuItem, Button} from '@material-ui/core';
 
 const UserDetailsBeforeJoining = (props) => {
-    const {myVideo, setMyVideo, setSubmited} = props;
+    const {myName, setMyName, myVideo, setMyVideo, setSubmited} = props;
     return(
         <FormControl>
             <TextField label= "Enter your name" value={myName} onChange={(e) => setMyName(e.target.value)} />

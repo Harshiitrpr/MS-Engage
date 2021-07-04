@@ -10,9 +10,6 @@ const CreateRoom = (props) => {
     return (
         <div>
             <section><button onClick={create}>Create room</button></section>
-            <section>
-                
-            </section>
         </div>
         
     );
