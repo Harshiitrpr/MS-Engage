@@ -5,6 +5,7 @@ import styled from "styled-components";
 import UserDetailsBeforeJoining from "./userDetails";
 import FootConfigurationBar from '../../navbar/footbar';
 import ChatDrawer from "../../chat/chatDrawer";
+import VideoGrid from "./conference"
 //material ui
 
 import { ToastContainer } from 'react-toastify';
@@ -19,26 +20,6 @@ const Container = styled.div`
     margin: auto;
     flex-wrap: wrap;
 `;
-
-const StyledVideo = styled.video`
-    height: 40%;
-    width: 50%;
-`;
-
-const Video = (props) => {
-    const ref = useRef();
-
-    useEffect(() => {
-        props.peer.on("stream", stream => {
-            ref.current.srcObject = stream;
-        })
-    }, []);
-
-    return (
-        <StyledVideo playsInline autoPlay ref={ref} />
-    );
-}
-
 
 const videoConstraints = {
     height: window.innerHeight / 2,
@@ -173,26 +154,20 @@ const Room = (props) => {
     if(submited)
     return (
         <Container>
-            <div id="room-container">
-                <StyledVideo muted ref={userVideo} autoPlay playsInline />
-                <div>{myName}</div>
-            </div>
-
-            {peers.map((peer) => {
-                return (
-                    <section key={peer.peerID}>
-                    <Video peer={peer.peer} />
-                    <div>{peer.name}</div>
-                    </section>
-                );
-            })}
-
+            <VideoGrid
+                myName = {myName}
+                peers= {peers}
+                userVideo= {userVideo}
+            />
+            {console.log("main page", roomID)}
             <FootConfigurationBar
+                myName = {myName}
                 socketRef={socketRef}
                 myVideo= {myVideo}
                 userVideo= {userVideo}
                 chatBoxVisible = {chatBoxVisible}
                 setChatBoxVisible= {setChatBoxVisible}
+                roomID= {roomID}
             />
             <ChatDrawer
                 // messages={messages}

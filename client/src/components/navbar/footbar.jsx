@@ -14,6 +14,7 @@ const FootConfigurationBar = (props) => {
 
     const [micStatus, setMicStatus] = useState(true);
     const [camStatus, setCamStatus] = useState(true);
+    console.log(roomID);
 
     const muteMic = () => {
         userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = !track.enabled);
@@ -42,7 +43,8 @@ const FootConfigurationBar = (props) => {
     }
 
     const handleEndCall = () => {
-        socketRef.current.emit("disconnect");
+        socketRef.current.disconnect();
+        props.history.push("/exit");
     }
 
     return(
@@ -67,7 +69,7 @@ const FootConfigurationBar = (props) => {
                         }
                     </div>}
                     <div className="screen-share-btn">
-                        <h4 className="screen-share-btn-text" onClick={shareScreen} >{myVideo === "screen" ? 'Stop Screen Share' : 'Share Screen'}</h4>
+                        <h4 className="screen-share-btn-text" onClick={shareScreen} >Share Screen</h4>
                     </div>
                     <IconButton  className="chat-btn" title="Chat" onClick={handleChatButton}>
                         <ChatIcon></ChatIcon>
