@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { v1 as uuid } from "uuid";
-import { Card, Button, Alert } from "react-bootstrap"
+import { Form, Card, Button, Alert, Container } from "react-bootstrap"
 import { useAuth } from "../../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 
@@ -8,6 +8,9 @@ export default function Dashboard() {
   const [error, setError] = useState("")
   const { currentUser, logout } = useAuth()
   const history = useHistory()
+
+  const conferenceRef = useRef();
+  const chatRef = useRef();
 
   const create = () => {
     const id = uuid();
@@ -25,22 +28,70 @@ export default function Dashboard() {
     }
   }
 
-  return (
-    <>
-      <Card>
+  const joinConference = () => {
+    history.push(`/room/${conferenceRef.current.value}`);
+  }
+
+  const joinChat = () =>{
+    history.push(`/chat/${chatRef.current.value}`);
+  }
+
+  return (<div>
+    <Container
+      className="d-flex align-items-center justify-content-around"
+      style={{ minHeight: "70vh" }}
+    >
+    <div className="d-flex justify-content-around" 
+    >
+      <Card className="align-items-center" style={{ minWidth: "35vh"}}>
         <Card.Body>
-          <h2 className="text-center mb-4">Profile</h2>
+          <h2 className="text-center mb-5">Profile</h2>
           {error && <Alert variant="danger">{error}</Alert>}
-          <strong>Email:</strong> {currentUser.email}
-          <button onClick={create}>Create room</button>
+          <div className="text-center">
+            <strong >Email:</strong> {currentUser.email}
+          </div>
+          <Button className="mt-5 w-100" onClick={create}>Create room</Button>
         </Card.Body>
       </Card>
-      <div className="w-100 text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>
-          Log Out
-        </Button>
-      </div>
-    </>
+      <Card>
+        <Card.Body>
+          <h2 className="text-center mb-4">Join Room</h2>
+          {/* {error && <Alert variant="danger">{error}</Alert>} */}
+          <Form onSubmit={joinConference}>
+                <Form.Group id="RoomIdForConference">
+                <Form.Label>Enter Link</Form.Label>
+                <Form.Control type="text" ref={conferenceRef} required />
+                </Form.Group>
+                <Button className="w-100 mt-4" type="submit">
+                Join Conference
+                </Button>
+            </Form>
+        </Card.Body>
+      </Card>
+      <Card>
+        <Card.Body>
+          <h2 className="text-center mb-4">Join Chat</h2>
+          {/* {error && <Alert variant="danger">{error}</Alert>} */}
+          <Form onSubmit={joinChat}>
+                <Form.Group id="RoomIdForChat">
+                <Form.Label>Enter Link</Form.Label>
+                <Form.Control type="text" ref={chatRef} required />
+                </Form.Group>
+                <Button className="w-100 mt-4" type="submit">
+                  Join Chat
+                </Button>
+            </Form>
+        </Card.Body>
+      </Card>
+    </div>
+    
+    </Container>
+    <div className=" text-center mb-sm-5">
+    <Button variant="outline-secondary"  onClick={handleLogout}>
+      Log Out
+    </Button>
+  </div>
+  </div>
   )
 }
 

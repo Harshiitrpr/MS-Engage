@@ -8,8 +8,8 @@ const ChatHeader = (props) => {
     }
 
     return(
-        <div>
-            <IconButton onClick={closeDrawer}>
+        <div className="chat-head-wrapper">
+            <IconButton onClick={closeDrawer} fullWidth="true">
                 <ChevronRightIcon />
             </IconButton>
         </div>

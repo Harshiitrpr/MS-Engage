@@ -8,6 +8,7 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
+import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 
 const FootConfigurationBar = (props) => {
     const { socketRef, myVideo, userVideo, chatBoxVisible, setChatBoxVisible, roomID, myName } = props;
@@ -48,32 +49,67 @@ const FootConfigurationBar = (props) => {
     }
 
     return(
-        <section className="chat-footbar">
+        <section className="chat-footbar" style={{
+            position:"absolute",
+            bottom:"10px",
+            width:"85%",
+            backgroundColor: "blue",
+            margin:"0 auto",
+            justifyContent: "center",
+        }}>
             <div className="footbar-title">Vi CHAT</div>
-                <Toolbar className="footbar-wrapper">
-                    { <div className="status-action-btn mic-btn" onClick={muteMic} title={micStatus ? 'Disable Mic' : 'Enable Mic'}>
+
+                <Toolbar className="footbar-wrapper" style={{
+                    backgroundColor:"purple",
+                    display:"flex",
+                    justifyContent: "center",
+                    width:"400px",
+                    margin:"0 auto",
+                }}>
+                    { <div className="status-action-btn mic-btn" onClick={muteMic} title={micStatus ? 'Disable Mic' : 'Enable Mic'}
+                    style={{
+                        border:"solid 1px black",
+                        // margin: "5px",
+                        padding: "5px",
+                    }}
+                    >
                         {micStatus ? 
-                            <MicIcon></MicIcon>
+                            <MicIcon fontSize="large"></MicIcon>
                             :
-                            <MicOffIcon></MicOffIcon>
+                            <MicOffIcon fontSize="large"></MicOffIcon>
                         }
                     </div>}
-                    <div className="status-action-btn end-call-btn" title="End Call">
-                        <CallIcon onClick= {handleEndCall}></CallIcon>
+                    <div className="status-action-btn end-call-btn" title="End Call"
+                    style={{
+                        border:"solid 1px black",
+                        padding: "5px",
+                    }}>
+                        <CallIcon onClick= {handleEndCall} fontSize="large"></CallIcon>
                     </div>
-                    {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}>
+                    {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}
+                    style={{
+                        border:"solid 1px black",
+                        padding: "5px",
+                    }}>
                         {camStatus ? 
-                            <VideocamIcon></VideocamIcon>
+                            <VideocamIcon fontSize="large"></VideocamIcon>
                             :
-                            <VideocamOffIcon></VideocamOffIcon>
+                            <VideocamOffIcon fontSize="large"></VideocamOffIcon>
                         }
                     </div>}
-                    <div className="screen-share-btn">
-                        <h4 className="screen-share-btn-text" onClick={shareScreen} >Share Screen</h4>
+                    <div className="screen-share-btn" style={{
+                        border:"solid 1px black",
+                        padding: "5px",
+                    }}>
+                        <ScreenShareIcon fontSize="large" className="screen-share-btn" onClick={shareScreen} />
                     </div>
-                    <IconButton  className="chat-btn" title="Chat" onClick={handleChatButton}>
-                        <ChatIcon></ChatIcon>
-                    </IconButton>
+                    <div  className="chat-btn" title="Chat" onClick={handleChatButton}style={{
+                        border:"solid 1px black",
+                        borderRadius: "0",
+                        padding: "5px",
+                    }}>
+                        <ChatIcon fontSize="large"></ChatIcon>
+                    </div>
             </Toolbar>
         </section>
     )

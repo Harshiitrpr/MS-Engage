@@ -5,33 +5,37 @@ import {Drawer, Divider} from '@material-ui/core';
 import ChatHead from "./chatHead/chatHead.jsx";
 import ChatWall from "./chatWall/chatWall.jsx";
 import SendMessageSection from "./sendMessageSection/sendMessageSection.jsx";
-
+import { useAuth } from '../../contexts/AuthContext.js';
 // Toast notifications
 import MessageToast from "../notifications/messageToast";
-
-import { notifyMessage as notify } from "../notifications/messageToast";
+import { firebaseDb } from '../../firebase.js';
+import "../../style/chatDrawer.scss"
 
 const ChatDrawer = (props) => {
     const {chatBoxVisible, setChatBoxVisible, socketRef, myName} = props;
-    console.log(socketRef);
+    const {currentUser} = useAuth();
+    const messageDb = firebaseDb.child("messages").child(props.roomID);
     return(
+        <div className="chat-drawer">
         <Drawer
             // className={classes.drawer}
             variant="persistent"
             anchor="right"
             open={chatBoxVisible}
+            // className="chat-drawer"
             // classes={{
             //     paper: classes.drawerPaper,
             // }}
         >
-            <ChatHead setChatBoxVisible = {setChatBoxVisible}/>
+            <ChatHead setChatBoxVisible = {setChatBoxVisible} email={currentUser.email}/>
             <Divider />
-            { socketRef.current ? <ChatWall socketRef={socketRef}/> : '' }
+            { socketRef.current ? <ChatWall email={currentUser.email} messageDb = {messageDb}/> : '' }
             
             <Divider />
-            { socketRef.current ? <SendMessageSection socketRef= {socketRef} myName={myName}/> : '' }
+            { socketRef.current ? <SendMessageSection email= {currentUser.email} myName={myName} messageDb={messageDb} /> : '' }
             <MessageToast/>
         </Drawer>
+        </div>
     )
 }
 

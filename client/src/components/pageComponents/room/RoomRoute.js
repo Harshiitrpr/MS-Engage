@@ -6,6 +6,8 @@ import UserDetailsBeforeJoining from "./userDetails";
 import FootConfigurationBar from '../../navbar/footbar';
 import ChatDrawer from "../../chat/chatDrawer";
 import VideoGrid from "./conference"
+
+import "firebase/database"
 //material ui
 
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +28,7 @@ const videoConstraints = {
     width: window.innerWidth / 2
 };
 
+
 const Room = (props) => {
     // console.log(props.match);
     const [peers, setPeers] = useState([]);
@@ -34,19 +37,18 @@ const Room = (props) => {
     const userStream = useRef();
     const peersRef = useRef([]);
     const roomID = props.match.params.roomID;
-
     //~beta 1~ alpha
     
 
     //~beta 2~ alpha
     const [myName, setMyName] = useState("");
     const [myVideo, setMyVideo] = useState("camera");
-    const [submited, setSubmited] = useState(false);
+    const [submited, setSubmited] = useState(true);
 
     //beta 3
     // const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
-    const [chatBoxVisible, setChatBoxVisible] = useState(true);
+    const [chatBoxVisible, setChatBoxVisible] = useState(false);
 
     useEffect(() => {
         if(submited){
@@ -176,6 +178,7 @@ const Room = (props) => {
                 setChatBoxVisible = {setChatBoxVisible}
                 socketRef= {socketRef}
                 myName= {myName}
+                roomID= {roomID}
             />
             <ToastContainer
                 position="top-right"
