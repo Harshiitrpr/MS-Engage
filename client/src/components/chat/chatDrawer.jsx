@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {Drawer, Divider} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 //sub components
 import ChatHead from "./chatHead/chatHead.jsx";
@@ -11,7 +12,14 @@ import MessageToast from "../notifications/messageToast";
 import { firebaseDb } from '../../firebase.js';
 import "../../style/chatDrawer.scss"
 
+const useStyles = makeStyles({
+    paper: {
+      background: '#f5f5f5',
+    }
+});
+
 const ChatDrawer = (props) => {
+    const styles = useStyles();
     const {chatBoxVisible, setChatBoxVisible, socketRef, myName} = props;
     const {currentUser} = useAuth();
     const messageDb = firebaseDb.child("messages").child(props.roomID);
@@ -23,9 +31,9 @@ const ChatDrawer = (props) => {
             anchor="right"
             open={chatBoxVisible}
             // className="chat-drawer"
-            // classes={{
-            //     paper: classes.drawerPaper,
-            // }}
+            classes={{
+                paper: styles.paper,
+            }}
         >
             <ChatHead setChatBoxVisible = {setChatBoxVisible} email={currentUser.email}/>
             <Divider />

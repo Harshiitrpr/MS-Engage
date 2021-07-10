@@ -31,6 +31,7 @@ $primaryBGColor: #2f9349;
         margin-right: 10px;
         margin-bottom: 58px;
         overflow-y: auto;
+        
         .message-container {
             display: flow-root;
             margin: 6px 4px 0 0;
@@ -44,9 +45,14 @@ $primaryBGColor: #2f9349;
                 font-size: 14px;
                 &.message-wrapper-right {
                     float: right;
+                    background-color:#adffaf;
+                }
+                &.message-wrapper-left {
+                    float: left;
+                    background-color:#c7ecfc
                 }
                 .message-title-wrapper {
-                    background-color: #f3f3f3;
+                    // background-color: #f3f3f3;
                     border-radius: 4px 4px 0 0;
                     padding: 4px;
                     display: flex;
@@ -82,6 +88,7 @@ $primaryBGColor: #2f9349;
         position: absolute;
     }
     .chat-drawer-input-wrapper {
+        border-top: 1px solid gray;
         padding: 10px;
         display: flex;
         justify-content: space-between;

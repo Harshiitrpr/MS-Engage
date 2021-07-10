@@ -54,7 +54,7 @@ const ChatWall = (props) => {
                     const { sender, message, timestamp, senderEmail } = chatDetails;
                     return (
                         <div key={index + timestamp} className="message-container">
-                            <div className={`message-wrapper ${senderEmail === props.email ? 'message-wrapper-right' : ''}`}>
+                            <div className={`message-wrapper ${senderEmail === props.email ? 'message-wrapper-right' : 'message-wrapper-left'}`}>
                                 <div className="message-title-wrapper">
                                     <h5 className="message-name">{sender}</h5>
                                     <span className="message-timestamp">{timestamp}</span>

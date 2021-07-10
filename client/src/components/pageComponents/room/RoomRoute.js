@@ -38,12 +38,11 @@ const Room = (props) => {
     const peersRef = useRef([]);
     const roomID = props.match.params.roomID;
     //~beta 1~ alpha
-    
 
     //~beta 2~ alpha
     const [myName, setMyName] = useState("");
     const [myVideo, setMyVideo] = useState("camera");
-    const [submited, setSubmited] = useState(true);
+    const [submited, setSubmited] = useState(false);
 
     //beta 3
     // const [messages, setMessages] = useState([]);
@@ -155,7 +154,10 @@ const Room = (props) => {
     
     if(submited)
     return (
-        <Container>
+        <Container fullWidth style={{
+            backgroundColor:"	#1b1a1a",
+            width:"100%",
+        }}>
             <VideoGrid
                 myName = {myName}
                 peers= {peers}

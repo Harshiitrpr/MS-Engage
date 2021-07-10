@@ -1,10 +1,9 @@
 import React, {useRef, useEffect} from 'react';
 import styled from "styled-components";
+import "../../../style/conference.scss"
 
 
 const StyledVideo = styled.video`
-    height: 40%;
-    width: 50%;
 `;
 
 const Video = (props) => {
@@ -17,7 +16,7 @@ const Video = (props) => {
     }, []);
 
     return (
-        <StyledVideo playsInline autoPlay ref={ref} />
+        <video playsInline autoPlay ref={ref} />
     );
 }
 
@@ -25,17 +24,17 @@ const VideoGrid = (props) => {
     const {userVideo, peers, myName} = props;
 
     return(
-        <div>
-            <div id="room-container">
-                <StyledVideo muted ref={userVideo} autoPlay playsInline />
-                <div>{myName}</div>
+        <div className="room-container">
+            <div>
+                <video className="my-stream" muted ref={userVideo} autoPlay playsInline />
+                <div className="video-title" style={{}}>{myName}</div>
             </div>
 
             {peers.map((peer) => {
                 return (
-                    <section key={peer.peerID}>
-                    <Video peer={peer.peer} />
-                    <div>{peer.name}</div>
+                    <section key={peer.peerID} style={{}}>
+                        <Video className="other-stream" peer={peer.peer} />
+                        {/* <div className="video-title">{peer.name}</div> */}
                     </section>
                 );
             })}

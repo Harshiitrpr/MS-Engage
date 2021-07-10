@@ -54,8 +54,11 @@ const SendMessageSection = (props) => {
             <form  noValidate autoComplete="off" onSubmit={sendMessage} style={{display: "flex", position: "absolute", margin: "5",
         right: "10px",
         bottom: "20px",
-        width: "90%"}}>
-                <Input placeholder="Type Here" fullWidth inputProps={{ 'aria-label': 'description' }} value= {message} onChange={(e) => {setMessage(e.target.value) }}/>
+        width: "90%",
+        backgroundColor:"#ffffff"
+        // borderTop: "1px solid gray",
+        }}>
+                <Input placeholder="  Type Here" fullWidth inputProps={{ 'aria-label': 'description' }} value= {message} onChange={(e) => {setMessage(e.target.value) }}/>
                 <IconButton type = "submit" onSubmit={() => sendMessage}><SendIcon fontSize="large" /></IconButton>
             </form>
         </div>

@@ -10,12 +10,14 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 
+import {useHistory} from "react-router-dom"
+
 const FootConfigurationBar = (props) => {
     const { socketRef, myVideo, userVideo, chatBoxVisible, setChatBoxVisible, roomID, myName } = props;
 
     const [micStatus, setMicStatus] = useState(true);
     const [camStatus, setCamStatus] = useState(true);
-    console.log(roomID);
+    const history = useHistory()
 
     const muteMic = () => {
         userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = !track.enabled);
@@ -45,7 +47,10 @@ const FootConfigurationBar = (props) => {
 
     const handleEndCall = () => {
         socketRef.current.disconnect();
-        props.history.push("/exit");
+        userVideo.current.srcObject.getTracks().forEach((track) =>{
+            track.stop();
+        });
+        history.push("/");
     }
 
     return(
@@ -53,14 +58,13 @@ const FootConfigurationBar = (props) => {
             position:"absolute",
             bottom:"10px",
             width:"85%",
-            backgroundColor: "blue",
+            // backgroundColor: "blue",
             margin:"0 auto",
             justifyContent: "center",
         }}>
             <div className="footbar-title">Vi CHAT</div>
 
                 <Toolbar className="footbar-wrapper" style={{
-                    backgroundColor:"purple",
                     display:"flex",
                     justifyContent: "center",
                     width:"400px",
@@ -70,45 +74,51 @@ const FootConfigurationBar = (props) => {
                     style={{
                         border:"solid 1px black",
                         // margin: "5px",
+                        backgroundColor:"#393838",
                         padding: "5px",
                     }}
                     >
                         {micStatus ? 
-                            <MicIcon fontSize="large"></MicIcon>
+                            <MicIcon style={{fill: "white",}} fontSize="large"></MicIcon>
                             :
-                            <MicOffIcon fontSize="large"></MicOffIcon>
+                            <MicOffIcon style={{fill: "white",}} fontSize="large"></MicOffIcon>
                         }
                     </div>}
                     <div className="status-action-btn end-call-btn" title="End Call"
                     style={{
                         border:"solid 1px black",
+                        backgroundColor:"red",
                         padding: "5px",
                     }}>
-                        <CallIcon onClick= {handleEndCall} fontSize="large"></CallIcon>
+                        <CallIcon style={{fill: "white",}} onClick= {handleEndCall} fontSize="large"></CallIcon>
                     </div>
                     {<div className="status-action-btn cam-btn" onClick={muteCam} title={camStatus ? 'Disable Cam' : 'Enable Cam'}
                     style={{
+                        backgroundColor:"#393838",
                         border:"solid 1px black",
                         padding: "5px",
                     }}>
                         {camStatus ? 
-                            <VideocamIcon fontSize="large"></VideocamIcon>
+                            <VideocamIcon style={{fill: "white",}} fontSize="large"></VideocamIcon>
                             :
-                            <VideocamOffIcon fontSize="large"></VideocamOffIcon>
+                            <VideocamOffIcon style={{fill: "white",}} fontSize="large"></VideocamOffIcon>
                         }
                     </div>}
                     <div className="screen-share-btn" style={{
+                        backgroundColor:"#393838",
                         border:"solid 1px black",
                         padding: "5px",
                     }}>
-                        <ScreenShareIcon fontSize="large" className="screen-share-btn" onClick={shareScreen} />
+                        <ScreenShareIcon style={{fill: "white",}} fontSize="large" className="screen-share-btn" onClick={shareScreen} />
                     </div>
                     <div  className="chat-btn" title="Chat" onClick={handleChatButton}style={{
                         border:"solid 1px black",
+                        
                         borderRadius: "0",
                         padding: "5px",
+                        backgroundColor:"#393838",
                     }}>
-                        <ChatIcon fontSize="large"></ChatIcon>
+                        <ChatIcon style={{fill: "white",}} fontSize="large" ></ChatIcon>
                     </div>
             </Toolbar>
         </section>
