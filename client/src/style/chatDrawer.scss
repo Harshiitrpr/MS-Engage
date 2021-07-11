@@ -29,8 +29,10 @@ $primaryBGColor: #2f9349;
         // height: 100%;
         margin: 6px;
         margin-right: 10px;
-        margin-bottom: 58px;
+        margin-bottom: 80px;
         overflow-y: auto;
+        overflow: -moz-scrollbars-none;
+        -ms-overflow-style: none; 
         
         .message-container {
             display: flow-root;
@@ -75,6 +77,11 @@ $primaryBGColor: #2f9349;
             margin-bottom: 10px;
         }
     }
+    
+    .chat-drawer-list::-webkit-scrollbar{
+        width: 0 !important;
+    }
+
     .chat-drawer-back-icon {
         background: $primaryColor;
         border-radius: 24px;
@@ -102,13 +109,5 @@ $primaryBGColor: #2f9349;
         .chat-drawer-input {
             width: 100%
         }
-        // .chat-drawer-input {
-        //     input, input:focus, input::after {
-        //         border-bottom: 2px solid green;
-        //     }
-        //     input::before, input::after {
-        //         transition: green 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
-        //     }
-        // }
     }
 }

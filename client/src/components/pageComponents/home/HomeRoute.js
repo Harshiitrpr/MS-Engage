@@ -11,6 +11,7 @@ export default function Dashboard() {
 
   const conferenceRef = useRef();
   const chatRef = useRef();
+  const nameRef = useRef();
 
   const create = () => {
     const id = uuid();
@@ -33,7 +34,13 @@ export default function Dashboard() {
   }
 
   const joinChat = () =>{
-    history.push(`/chat/${chatRef.current.value}`);
+    const data = {
+      myName: nameRef.current.value
+    }
+    history.push({
+      pathname: `/chat/${chatRef.current.value}`,
+      state: data,
+    });
   }
 
   return (<div>
@@ -41,28 +48,27 @@ export default function Dashboard() {
       className="d-flex align-items-center justify-content-around"
       style={{ minHeight: "70vh" }}
     >
-    <div className="d-flex justify-content-around" 
-    >
+    <div className="d-flex justify-content-around" >
       <Card className="align-items-center" style={{ minWidth: "35vh"}}>
-        <Card.Body>
+        <Card.Body className="d-flex flex-column">
           <h2 className="text-center mb-5">Profile</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <div className="text-center">
-            <strong >Email:</strong> {currentUser.email}
+            <strong>Email:</strong> {currentUser.email}
           </div>
-          <Button className="mt-5 w-100" onClick={create}>Create room</Button>
+          <Button className="mt-auto w-100" onClick={create}>Create room</Button>
         </Card.Body>
       </Card>
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-4">Join Room</h2>
+          <h2 className="text-center" className="mb-5">Join Room</h2>
           {/* {error && <Alert variant="danger">{error}</Alert>} */}
-          <Form onSubmit={joinConference}>
-                <Form.Group id="RoomIdForConference">
-                <Form.Label>Enter Link</Form.Label>
-                <Form.Control type="text" ref={conferenceRef} required />
+          <Form onSubmit={joinConference} className="d-flex flex-column mb-auto">
+                <Form.Group id="RoomIdForConference" className="mb-5">
+                  <Form.Label>Enter Link</Form.Label>
+                  <Form.Control className="mb-2" type="text" ref={conferenceRef} required />
                 </Form.Group>
-                <Button className="w-100 mt-4" type="submit">
+                <Button className="w-100 mt-3" type="submit">
                 Join Conference
                 </Button>
             </Form>
@@ -76,8 +82,10 @@ export default function Dashboard() {
                 <Form.Group id="RoomIdForChat">
                 <Form.Label>Enter Link</Form.Label>
                 <Form.Control type="text" ref={chatRef} required />
+                <Form.Label>Enter Name</Form.Label>
+                <Form.Control type="text" ref={nameRef} required />
                 </Form.Group>
-                <Button className="w-100 mt-4" type="submit">
+                <Button className="w-100 mt-2" type="submit">
                   Join Chat
                 </Button>
             </Form>

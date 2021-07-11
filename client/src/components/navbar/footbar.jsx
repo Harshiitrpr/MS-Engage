@@ -30,7 +30,7 @@ const FootConfigurationBar = (props) => {
     }
 
     const shareScreen = () => {
-        if(myVideo === "camera"){
+        if(myVideo === "Camera"){
             const url = "http://localhost:3000/room/" + roomID;
             localStorage.setItem("sharescreen", true);
             localStorage.setItem("myName", myName);
@@ -58,11 +58,13 @@ const FootConfigurationBar = (props) => {
             position:"absolute",
             bottom:"10px",
             width:"85%",
+            
             // backgroundColor: "blue",
             margin:"0 auto",
+            marginLeft:"10px",
             justifyContent: "center",
         }}>
-            <div className="footbar-title">Vi CHAT</div>
+            {/* <div className="footbar-title">Vi CHAT</div> */}
 
                 <Toolbar className="footbar-wrapper" style={{
                     display:"flex",

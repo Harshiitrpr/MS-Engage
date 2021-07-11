@@ -38,8 +38,6 @@ const ChatDrawer = (props) => {
             <ChatHead setChatBoxVisible = {setChatBoxVisible} email={currentUser.email}/>
             <Divider />
             { socketRef.current ? <ChatWall email={currentUser.email} messageDb = {messageDb}/> : '' }
-            
-            <Divider />
             { socketRef.current ? <SendMessageSection email= {currentUser.email} myName={myName} messageDb={messageDb} /> : '' }
             <MessageToast/>
         </Drawer>

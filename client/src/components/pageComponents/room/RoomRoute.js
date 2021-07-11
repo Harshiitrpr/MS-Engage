@@ -41,24 +41,37 @@ const Room = (props) => {
 
     //~beta 2~ alpha
     const [myName, setMyName] = useState("");
-    const [myVideo, setMyVideo] = useState("camera");
+    const [myVideo, setMyVideo] = useState("Camera");
     const [submited, setSubmited] = useState(false);
+    const [micToggle, setMicToggle] = useState(false);
+    const [videoToggle, setVideoToggle] = useState(false);
 
     //beta 3
     // const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState("");
     const [chatBoxVisible, setChatBoxVisible] = useState(false);
+
+    try{
+        const {state} = props.location;
+        setVideoToggle(state.videoToggle);
+        setMicToggle(state.micToggle);
+        setMyName(state.myName);
+        setMyVideo(state.myVideo);
+    }catch(err){
+        console.log(err)
+    }
 
     useEffect(() => {
         if(submited){
             socketRef.current = io.connect("/");
-            const media = (myVideo === "camera") ? navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true })
+            const media = (myVideo === "Camera") ? navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true })
             : navigator.mediaDevices.getDisplayMedia()
             media.then(stream => {
                 userVideo.current.srcObject = stream;
                 userStream.current = stream;
 
-                console.log(socketRef);
+                userVideo.current.srcObject.getVideoTracks().forEach(track => track.enabled = videoToggle);
+                userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = micToggle);
+
                 socketRef.current.emit("join room", roomID, myName);
                 socketRef.current.on("all users", users => {
                     const peers = [];
@@ -201,6 +214,10 @@ const Room = (props) => {
             setMyName={setMyName}
             myVideo={myVideo}
             setMyVideo={setMyVideo}
+            micToggle= {micToggle}
+            videoToggle= {videoToggle}
+            setMicToggle= {setMicToggle}
+            setVideoToggle= {setVideoToggle}
             setSubmited= {setSubmited}
         />
     }
