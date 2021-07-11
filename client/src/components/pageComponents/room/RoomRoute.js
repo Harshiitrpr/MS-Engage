@@ -135,7 +135,7 @@ const Room = (props) => {
         }
     }, [submited]);
 
-    function createPeer(userToSignal, callerID, stream) {
+    const createPeer = (userToSignal, callerID, stream) => {
         const peer = new Peer({
             initiator: true,
             trickle: false,
@@ -149,7 +149,7 @@ const Room = (props) => {
         return peer;
     }
 
-    function addPeer(incomingSignal, callerID, stream) {
+    const addPeer = (incomingSignal, callerID, stream) => {
         const peer = new Peer({
             initiator: false,
             trickle: false,

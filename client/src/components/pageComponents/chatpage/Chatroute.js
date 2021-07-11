@@ -1,6 +1,7 @@
 import React, {useRef, useState, useEffect} from 'react';
 import {firebaseDb} from "../../../firebase";
 import {useAuth} from "../../../contexts/AuthContext";
+import { getMessageDateOrTime } from "../../../utils/helperFunctions"
 import { useHistory } from "react-router-dom"
 import ChatMessage from './ChatMessage';
 import "../../../style/chatRoom.scss"
@@ -10,32 +11,7 @@ import { Button } from 'react-bootstrap';
 import SendIcon from '@material-ui/icons/Send';
 
 
-function getMessageDateOrTime(date) {
-    if (date !== null) {
-        const dateObj = new Date(date);
-        const dateDetails = {
-            date: dateObj.getDate(),
-            month: dateObj.getMonth() + 1,
-            year: dateObj.getFullYear(),
-            hour: dateObj.getHours(),
-            minutes: dateObj.getMinutes()
-        }
-        const currentDateObj = new Date();
-        const currentDateDetails = {
-            date: currentDateObj.getDate(),
-            month: currentDateObj.getMonth() + 1,
-            year: currentDateObj.getFullYear(),
-            hour: currentDateObj.getHours(),
-            minutes: currentDateObj.getMinutes()
-        }
-        if (dateDetails.year !== currentDateDetails.year && dateDetails.month !== currentDateDetails.month && dateDetails.date !== currentDateDetails.date) {
-            return dateDetails.date + '-' + dateDetails.month + '-' + dateDetails.year;
-        } else {
-            return dateDetails.hour + ':' + dateDetails.minutes + ` ${dateDetails.hour < 12 ? 'AM' : 'PM'}`
-        }
-    }
-    return '';
-}
+
 
 const ChatRoute = (props) => {
     // console.log(props);
@@ -63,7 +39,8 @@ const ChatRoute = (props) => {
                 message: message, 
                 sender: myName,
                 timestamp: getMessageDateOrTime(new Date()), 
-                senderEmail: currentUser.email };  
+                senderEmail: currentUser.email 
+            };  
             firebaseDb.child("messages").child(roomID).push(messageDetail);
         }
         setMessage('');

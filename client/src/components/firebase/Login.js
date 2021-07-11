@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import { Container } from "react-bootstrap"
 
-export default function Login() {
+const Login = () => {
     const emailRef = useRef()
     const passwordRef = useRef()
     const { login } = useAuth()
@@ -12,7 +12,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false)
     const history = useHistory()
 
-    async function handleSubmit(e) {
+    const handleSubmit = async(e) => {
         e.preventDefault()
 
         try {
@@ -62,3 +62,5 @@ export default function Login() {
         </Container>
     )
 }
+
+export default Login;

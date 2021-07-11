@@ -1,36 +1,12 @@
 import React, {useState} from "react";
 import {IconButton, Input} from "@material-ui/core";
 import SendIcon from '@material-ui/icons/Send';
+import {getMessageDateOrTime} from "../../../utils/helperFunctions";
 
 const SendMessageSection = (props) => {
     const [message, setMessage] = useState("");
 
-    function getMessageDateOrTime(date) {
-        if (date !== null) {
-            const dateObj = new Date(date);
-            const dateDetails = {
-                date: dateObj.getDate(),
-                month: dateObj.getMonth() + 1,
-                year: dateObj.getFullYear(),
-                hour: dateObj.getHours(),
-                minutes: dateObj.getMinutes()
-            }
-            const currentDateObj = new Date();
-            const currentDateDetails = {
-                date: currentDateObj.getDate(),
-                month: currentDateObj.getMonth() + 1,
-                year: currentDateObj.getFullYear(),
-                hour: currentDateObj.getHours(),
-                minutes: currentDateObj.getMinutes()
-            }
-            if (dateDetails.year !== currentDateDetails.year && dateDetails.month !== currentDateDetails.month && dateDetails.date !== currentDateDetails.date) {
-                return dateDetails.date + '-' + dateDetails.month + '-' + dateDetails.year;
-            } else {
-                return dateDetails.hour + ':' + dateDetails.minutes + ` ${dateDetails.hour < 12 ? 'AM' : 'PM'}`
-            }
-        }
-        return '';
-    }
+    
 
     const sendMessage = (e)=> {
         e.preventDefault();

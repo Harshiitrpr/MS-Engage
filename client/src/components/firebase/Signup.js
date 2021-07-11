@@ -4,8 +4,7 @@ import { useAuth } from "../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import firebaseDb from "../../firebase";
 
-export default function Signup() {
-    // const usernameRef = useRef();
+const Signup = () => {
     const emailRef = useRef()
     const passwordRef = useRef()
     const passwordConfirmRef = useRef()
@@ -14,8 +13,8 @@ export default function Signup() {
     const [loading, setLoading] = useState(false)
     const history = useHistory()
 
-    async function handleSubmit(e) {
-        e.preventDefault()
+    const handleSubmit = async(e) => {
+        e.preventDefault();
 
         if (passwordRef.current.value !== passwordConfirmRef.current.value) {
         return setError("Passwords do not match")
@@ -75,3 +74,6 @@ export default function Signup() {
         </Container>
     )
 }
+
+
+export default Signup;

@@ -12,7 +12,7 @@ import RoomRoute from "./components/pageComponents/room/RoomRoute"
 import CheckOut from "./components/pageComponents/exit/ExitRoute"
 import ChatRoute from "./components/pageComponents/chatpage/Chatroute";
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
     <AuthProvider>
