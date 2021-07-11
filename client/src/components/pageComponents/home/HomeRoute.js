@@ -5,6 +5,7 @@ import { useAuth } from "../../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 
 export default function Dashboard() {
+  console.log(process.env);
   const [error, setError] = useState("")
   const { currentUser, logout } = useAuth()
   const history = useHistory()
