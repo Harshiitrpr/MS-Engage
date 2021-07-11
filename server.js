@@ -36,10 +36,10 @@ io.on('connection', socket => {
         io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
     });
 
-    socket.on("sending message", messageDetail => {
-        console.log("server recieved message");
-        io.emit("receiving message", messageDetail);
-    })
+    // socket.on("sending message", messageDetail => {
+    //     console.log("server recieved message");
+    //     io.emit("receiving message", messageDetail);
+    // })
 
     socket.on('disconnect', () => {
         const roomID = socketToRoom[socket.id];
@@ -59,6 +59,7 @@ if(process.env.PROD){
         res.sendFile(path.join(__dirname,'./client/build/index.html'));
     });
 }
+
 const port = process.env.PORT || 8000
 server.listen(port, () => console.log(`server is running on port ${port}`));
 
