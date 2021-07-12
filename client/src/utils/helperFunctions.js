@@ -2,7 +2,7 @@ const fixTwoDigits = (number) => {
     return ("0" + number).slice(-2);
 }
 
-const getMessageDateOrTime = (date) => {
+export const getMessageDateOrTime = (date) => {
     if (date !== null) {
         const dateObj = new Date(date);
         const dateDetails = {
@@ -28,5 +28,3 @@ const getMessageDateOrTime = (date) => {
     }
     return '';
 }
-
-export default getMessageDateOrTime;

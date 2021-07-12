@@ -1,5 +1,4 @@
-import React, {useRef, useEffect} from 'react';
-import styled from "styled-components";
+import React, {useRef, useEffect, useState} from 'react';
 import "../../../style/conference.scss"
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -12,13 +11,22 @@ const Video = (props) => {
         })
     }, []);
 
-    return (
-        <video playsInline autoPlay ref={ref} />
+    return (<Tooltip disableFocusListener title={props.name} arrow>
+            <video playsInline autoPlay ref={ref}/>
+        </Tooltip>
     );
 }
 
 const VideoGrid = (props) => {
     const {userVideo, peers, myName} = props;
+    const [pin, setPin] = useState(false);
+    const [keyPinned, setKeyPinned] = useState('');
+
+    const handlePin = (id) => {
+        console.log("handlePin", id);
+        setPin(!pin);
+        setKeyPinned(id);
+    }
 
     return(
         <div className="room-container">
@@ -26,18 +34,15 @@ const VideoGrid = (props) => {
             <Tooltip disableFocusListener title={myName} arrow>
                 <video className="my-stream" muted ref={userVideo} autoPlay playsInline />
             </Tooltip>
-                {/* <div className="video-title" style={{}}>{myName}</div> */}
             </div>
 
             {peers.map((peer) => {
-                return (
-                    <section key={peer.peerID} style={{}}>
-                        <Tooltip disableFocusListener title={peer.name} arrow>
-                            <Video className="other-stream" peer={peer.peer} />
-                        </Tooltip>
-                        {/* <div className="video-title">{peer.name}</div> */}
+                return pin && keyPinned !== peer.peerID ? '': (
+                    <section key={peer.peerID} style={{}} onClick={()=> handlePin(peer.peerID)}>
+                        {console.log(pin, keyPinned, peer.id)}
+                            <Video className="other-stream" peer={peer.peer} name = {peer.name}/>
                     </section>
-                );
+                )
             })}
         </div>
     )

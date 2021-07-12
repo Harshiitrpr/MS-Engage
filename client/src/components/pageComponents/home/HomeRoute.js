@@ -18,14 +18,14 @@ const Dashboard = () => {
         history.push(`/room/${id}`);
     }
 
-    const handleLogout = () => {
+    const handleLogout = async() => {
         setError("")
 
         try {
-        await logout()
-        history.push("/login")
+            await logout()
+            history.push("/login")
         } catch {
-        setError("Failed to log out")
+            setError("Failed to log out")
         }
     }
 

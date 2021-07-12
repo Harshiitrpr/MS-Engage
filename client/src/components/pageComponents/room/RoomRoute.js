@@ -180,6 +180,8 @@ const Room = (props) => {
             <FootConfigurationBar
                 myName = {myName}
                 socketRef={socketRef}
+                initialMicStatus = {micToggle}
+                initialVideoStatus = {videoToggle}
                 myVideo= {myVideo}
                 userVideo= {userVideo}
                 chatBoxVisible = {chatBoxVisible}

@@ -13,10 +13,11 @@ import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import {useHistory} from "react-router-dom"
 
 const FootConfigurationBar = (props) => {
-    const { socketRef, myVideo, userVideo, chatBoxVisible, setChatBoxVisible, roomID, myName } = props;
+    const { socketRef, myVideo, userVideo, initialMicStatus, initialVideoStatus,
+        chatBoxVisible, setChatBoxVisible, roomID, myName } = props;
 
-    const [micStatus, setMicStatus] = useState(true);
-    const [camStatus, setCamStatus] = useState(true);
+    const [micStatus, setMicStatus] = useState(initialMicStatus);
+    const [camStatus, setCamStatus] = useState(initialVideoStatus);
     const history = useHistory()
 
     const muteMic = () => {
@@ -31,7 +32,9 @@ const FootConfigurationBar = (props) => {
 
     const shareScreen = () => {
         if(myVideo === "Camera"){
-            const url = "http://localhost:3000/room/" + roomID;
+            const hostedWebsie = "https://radiant-chamber-36927.herokuapp.com/";
+            // const hostedWebsie = "http://localhost:3000/";
+            const url = hostedWebsie + "room/" + roomID;
             localStorage.setItem("sharescreen", true);
             localStorage.setItem("myName", myName);
             window.open(url, '_blank');

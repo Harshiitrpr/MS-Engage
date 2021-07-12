@@ -33,7 +33,7 @@ const UserDetailsBeforeJoining = (props) => {
                     </Form.Control>
                 </Form.Group>
                 <Form.Check custom type="switch">
-                    <Form.Check.Input checked={videoToggle} />
+                    <Form.Check.Input checked={videoToggle} onClick={() => setVideoToggle(!videoToggle)}/>
                     <Form.Check.Label onClick={() => setVideoToggle(!videoToggle)}>
                         {videoToggle? `${myVideo} On`: `${myVideo} Off`}
                     </Form.Check.Label>
