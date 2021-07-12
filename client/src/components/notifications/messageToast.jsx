@@ -1,6 +1,7 @@
 import React from "react";
 import { ToastContainer, toast } from 'react-toastify';
 
+// component sends a toast notification on new message arrival.
 export const notifyMessage = async(messageDetail) => {
     toast(<div>
         <div>{messageDetail.sender}</div>

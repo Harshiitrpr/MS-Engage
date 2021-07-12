@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react"
-import { v1 as uuid } from "uuid";
 import { Form, Card, Button, Alert, Container } from "react-bootstrap"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useHistory } from "react-router-dom"
+//for unique ids
+import { v1 as uuid } from "uuid";
 
 const Dashboard = () => {
     const [error, setError] = useState("")
@@ -49,21 +50,20 @@ const Dashboard = () => {
         style={{ minHeight: "70vh" }}
         >
         <div className="d-flex justify-content-around" >
-        <Card className="align-items-center" style={{ minWidth: "35vh"}}>
-            <Card.Body className="d-flex flex-column">
-            <h2 className="text-center mb-5">Profile</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
-            <div className="text-center">
-                <strong>Email:</strong> {currentUser.email}
-            </div>
-            <Button className="mt-auto w-100" onClick={create}>Create room</Button>
-            </Card.Body>
-        </Card>
+            <Card className="align-items-center" style={{ minWidth: "35vh"}}>
+                <Card.Body className="d-flex flex-column">
+                    <h2 className="text-center mb-5">Profile</h2>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    <div className="text-center">
+                        <strong>Email:</strong> {currentUser.email}
+                    </div>
+                    <Button className="mt-auto w-100" onClick={create}>Create room</Button>
+                </Card.Body>
+            </Card>
         <Card>
             <Card.Body>
-            <h2 className="text-center" className="mb-5">Join Room</h2>
-            {/* {error && <Alert variant="danger">{error}</Alert>} */}
-            <Form onSubmit={joinConference} className="d-flex flex-column mb-auto">
+                <h2 className="text-center" className="mb-5">Join Room</h2>
+                <Form onSubmit={joinConference} className="d-flex flex-column mb-auto">
                     <Form.Group id="RoomIdForConference" className="mb-5">
                     <Form.Label>Enter Link</Form.Label>
                     <Form.Control className="mb-2" type="text" ref={conferenceRef} required />

@@ -3,6 +3,8 @@ import { Form, Button, Card, Alert, Container } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link } from "react-router-dom"
 
+
+// Forget password page
 const ForgotPassword = () => {
     const emailRef = useRef()
     const { resetPassword } = useAuth()
@@ -25,7 +27,8 @@ const ForgotPassword = () => {
         setLoading(false)
     }
 
-    return (<Container
+    return (
+    <Container
         className="d-flex align-items-center justify-content-center"
         style={{ minHeight: "100vh" }}>
         <div className="w-100" style={{ maxWidth: "400px" }}>
@@ -52,8 +55,8 @@ const ForgotPassword = () => {
                 Need an account? <Link to="/signup">Sign Up</Link>
             </div>
         </div>
-        </Container>
+    </Container>
     )
 }
 
-export default forgetPassword;
+export default ForgotPassword;

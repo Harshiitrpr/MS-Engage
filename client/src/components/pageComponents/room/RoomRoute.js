@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import styled from "styled-components";
+
+// sub components
 import UserDetailsBeforeJoining from "./userDetails";
 import FootConfigurationBar from '../../navbar/footbar';
 import ChatDrawer from "../../chat/chatDrawer";
 import VideoGrid from "./conference"
 
-import "firebase/database"
-//material ui
-
 import { ToastContainer } from 'react-toastify';
 
-// jsx of react-toastify
+//styling
 import 'react-toastify/dist/ReactToastify.css';
+import styled from "styled-components";
+
 const Container = styled.div`
     padding: 20px;
     display: flex;
@@ -30,25 +30,22 @@ const videoConstraints = {
 
 
 const Room = (props) => {
-    // console.log(props.match);
+    // use states
     const [peers, setPeers] = useState([]);
-    const socketRef = useRef();
-    const userVideo = useRef();
-    const userStream = useRef();
-    const peersRef = useRef([]);
-    const roomID = props.match.params.roomID;
-    //~beta 1~ alpha
-
-    //~beta 2~ alpha
     const [myName, setMyName] = useState("");
     const [myVideo, setMyVideo] = useState("Camera");
     const [submited, setSubmited] = useState(false);
     const [micToggle, setMicToggle] = useState(false);
     const [videoToggle, setVideoToggle] = useState(false);
-
-    //beta 3
-    // const [messages, setMessages] = useState([]);
     const [chatBoxVisible, setChatBoxVisible] = useState(false);
+
+    const socketRef = useRef();
+    const userVideo = useRef();
+    const userStream = useRef();
+    const peersRef = useRef([]);
+
+    // roomid
+    const roomID = props.match.params.roomID;
 
     try{
         const {state} = props.location;
@@ -68,11 +65,14 @@ const Room = (props) => {
             media.then(stream => {
                 userVideo.current.srcObject = stream;
                 userStream.current = stream;
-
+                
+                // initial configuration of mic and video
                 userVideo.current.srcObject.getVideoTracks().forEach(track => track.enabled = videoToggle);
                 userVideo.current.srcObject.getAudioTracks().forEach(track => track.enabled = micToggle);
 
                 socketRef.current.emit("join room", roomID, myName);
+                
+                // offering handshake to all old users
                 socketRef.current.on("all users", users => {
                     const peers = [];
                     users.forEach(user => {
@@ -90,7 +90,8 @@ const Room = (props) => {
                     })
                     setPeers(peers);
                 })
-    
+                
+                // completing handshake with new user
                 socketRef.current.on("user joined", payload => {
                     const peer = addPeer(payload.signal, payload.callerID, stream);
                     peersRef.current.push({
@@ -125,12 +126,14 @@ const Room = (props) => {
             });
         }
         else{
+            // if someone clicked share screen
             if(localStorage.getItem("sharescreen")){
                 setMyName(localStorage.getItem("myName"));
                 setMyVideo("screen");
                 localStorage.removeItem("myName");
                 localStorage.removeItem("sharescreen");
                 setSubmited(true);
+                setVideoToggle(true);
             }
         }
     }, [submited]);
@@ -189,8 +192,6 @@ const Room = (props) => {
                 roomID= {roomID}
             />
             <ChatDrawer
-                // messages={messages}
-                // setMessages={setMessages} 
                 chatBoxVisible = {chatBoxVisible}
                 setChatBoxVisible = {setChatBoxVisible}
                 socketRef= {socketRef}

@@ -3,15 +3,15 @@ import {firebaseDb} from "../../../firebase";
 import {useAuth} from "../../../contexts/AuthContext";
 import { getMessageDateOrTime } from "../../../utils/helperFunctions"
 import { useHistory } from "react-router-dom"
-import ChatMessage from './ChatMessage';
-import "../../../style/chatRoom.scss"
 
+// subcomponent
+import ChatMessage from './ChatMessage';
+
+// styling and icons
 import {IconButton, Input} from "@material-ui/core";
 import { Button } from 'react-bootstrap';
 import SendIcon from '@material-ui/icons/Send';
-
-
-
+import "../../../style/chatRoom.scss"
 
 const ChatRoute = (props) => {
     // console.log(props);
@@ -44,7 +44,7 @@ const ChatRoute = (props) => {
             firebaseDb.child("messages").child(roomID).push(messageDetail);
         }
         setMessage('');
-        // chatref.current.scrollIntoView({ behavior: 'smooth' });
+        // chatref.current.scrollIntoView("")
     }
 
     const handleExit = () => {
@@ -64,9 +64,7 @@ const ChatRoute = (props) => {
             </div>
             <form className="chat-room-form" onSubmit={sendMessage}>
             <Input placeholder="  Type Here" fullWidth inputProps={{ 'aria-label': 'description' }} value= {message} onChange={(e) => {setMessage(e.target.value) }}/>
-                {/* <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="say something nice" /> */}
                 <IconButton type = "submit" onSubmit={() => sendMessage}><SendIcon fontSize="large" /></IconButton>
-                
             </form>
     </div>
     </div>)

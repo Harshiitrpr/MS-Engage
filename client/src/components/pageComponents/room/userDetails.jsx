@@ -1,6 +1,8 @@
 import React, {useRef} from "react";
-import { Form, Card, Button, Alert, Container } from "react-bootstrap"
+// bootstrap container
+import { Form, Card, Button, Container } from "react-bootstrap"
 
+// pre joining menu
 const UserDetailsBeforeJoining = (props) => {
     const  {setMyName, myVideo, setMyVideo, setSubmited,
             videoToggle, setVideoToggle, micToggle, setMicToggle} = props;
@@ -12,6 +14,7 @@ const UserDetailsBeforeJoining = (props) => {
         setSubmited(true);
     }
     
+    // name camera/screen micstatus videostatus
     return(<Container
         className="d-flex align-items-center justify-content-center"
         style={{ minHeight: "100vh" }}
@@ -20,7 +23,6 @@ const UserDetailsBeforeJoining = (props) => {
         <Card>
         <Card.Body>
             <h2 className="text-center mb-4">Join Room</h2>
-            {/* {error && <Alert variant="danger">{error}</Alert>} */}
             <Form onSubmit={joinConference}>
                 <Form.Group>
                     <Form.Label>User Name</Form.Label>

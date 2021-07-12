@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
-import { Toolbar, IconButton } from '@material-ui/core';
+
+// container
+import { Toolbar } from '@material-ui/core';
 
 //icon imports
 import CallIcon from '@material-ui/icons/CallEnd';
@@ -10,6 +12,7 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 
+//history for redirect to home page after end call
 import {useHistory} from "react-router-dom"
 
 const FootConfigurationBar = (props) => {
@@ -30,17 +33,28 @@ const FootConfigurationBar = (props) => {
         setCamStatus(!camStatus);
     }
 
+    //opens another tab to share screen, or close tab if share screen is on.
+    // toggle hostedwebsite to localhost while running on local device.
     const shareScreen = () => {
         if(myVideo === "Camera"){
-            const hostedWebsie = "https://radiant-chamber-36927.herokuapp.com/";
-            // const hostedWebsie = "http://localhost:3000/";
-            const url = hostedWebsie + "room/" + roomID;
+            // const hostedWebsite = "https://radiant-chamber-36927.herokuapp.com/";
+            const hostedWebsite = "http://localhost:3000/";
+            const url = hostedWebsite + "room/" + roomID;
             localStorage.setItem("sharescreen", true);
             localStorage.setItem("myName", myName);
             window.open(url, '_blank');
         }
         else{
-            window.close();
+            try{
+                window.close();
+            }
+            catch{
+                socketRef.current.disconnect();
+                userVideo.current.srcObject.getTracks().forEach((track) =>{
+                    track.stop();
+                });
+                history.push("/");
+            }
         }
     }
 

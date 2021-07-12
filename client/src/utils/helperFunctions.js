@@ -2,6 +2,7 @@ const fixTwoDigits = (number) => {
     return ("0" + number).slice(-2);
 }
 
+// geting time as string for today, else data as string
 export const getMessageDateOrTime = (date) => {
     if (date !== null) {
         const dateObj = new Date(date);

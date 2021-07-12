@@ -1,5 +1,6 @@
 import React from "react";
 
+// render main messages in the chat room
 const ChatMessage = (props) => {
     const { sender, message, timestamp, senderEmail } = props.message;
     console.log(props);

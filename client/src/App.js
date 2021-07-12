@@ -9,7 +9,6 @@ import Signup from "./components/firebase/Signup";
 import Login from "./components/firebase/Login";
 import HomeRoute from "./components/pageComponents/home/HomeRoute"
 import RoomRoute from "./components/pageComponents/room/RoomRoute"
-import CheckOut from "./components/pageComponents/exit/ExitRoute"
 import ChatRoute from "./components/pageComponents/chatpage/Chatroute";
 
 const App = () => {
@@ -22,7 +21,6 @@ const App = () => {
         <PrivateRoute path="/chat/:roomID" component={ChatRoute}/>
         <Route path="/signup" component={Signup} />
         <Route path="/login" component={Login} />
-        <Route path="/exit" component={CheckOut} />
       </Switch>
       </AuthProvider>
     </BrowserRouter>

@@ -1,12 +1,16 @@
 import React, {useEffect, useState} from "react";
-//toast trigger
+
+// Toast notification
 import { notifyMessage as notify } from "../../notifications/messageToast";
+
+// This component is main display of all the messages.
 
 const ChatWall = (props) => {
     const { messageDb, email} = props;
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
+        //adding message listener
         messageDb.on("child_added", snap=>{
             messages.push(snap.val());
             console.log(snap.val());
@@ -14,20 +18,16 @@ const ChatWall = (props) => {
             var sendingMinutes = parseInt(snap.val().timestamp.slice(3,5));
             var currentTimeStamp = new Date();
             var currentMinutes = currentTimeStamp.getMinutes();
-            if(snap.val().senderEmail !== email && (sendingMinutes === currentMinutes ||
-                sendingMinutes + 1 === currentMinutes || 
-                (sendingMinutes === 59 && currentMinutes === 0)
-            ))
-            {
+
+            // If messages are not preloaded and not sent by me, notify me
+            if(snap.val().senderEmail !== email && 
+                (sendingMinutes === currentMinutes ||
+                    sendingMinutes + 1 === currentMinutes || 
+                    (sendingMinutes === 59 && currentMinutes === 0)
+                )){
                 notify(snap.val());
             }
         })
-        // socketRef.current.on("receiving message", messageDetail => {
-        //     console.log("client recieved message");
-        //     messages.push(messageDetail);
-        //     notify(messageDetail);
-        //     setMessages([...messages]);
-        // })
     }, [])
 
     return(

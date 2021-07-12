@@ -4,6 +4,8 @@ import { useAuth } from "../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import { Container } from "react-bootstrap"
 
+// Log in page
+
 const Login = () => {
     const emailRef = useRef()
     const passwordRef = useRef()
@@ -16,21 +18,21 @@ const Login = () => {
         e.preventDefault()
 
         try {
-        setError("")
-        setLoading(true)
-        await login(emailRef.current.value, passwordRef.current.value)
-        history.push("/")
+            setError("")
+            setLoading(true)
+            await login(emailRef.current.value, passwordRef.current.value)
+            history.push("/")
         } catch {
-        setError("Failed to log in")
+            setError("Failed to log in")
         }
 
         setLoading(false)
     }
 
     return (
-        <Container
-      className="d-flex align-items-center justify-content-center"
-      style={{ minHeight: "100vh" }}
+    <Container
+        className="d-flex align-items-center justify-content-center"
+        style={{ minHeight: "100vh" }}
     >
       <div className="w-100" style={{ maxWidth: "400px" }}>
         <Card>
