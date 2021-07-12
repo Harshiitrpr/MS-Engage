@@ -14,7 +14,7 @@ const Video = (props) => {
         })
     }, []);
     return (<Tooltip disableFocusListener title={props.name} arrow>
-            <video poster="../../../style/user.png" playsInline autoPlay ref={ref}/>
+            <video playsInline autoPlay ref={ref}/>
         </Tooltip>
     );
 }
@@ -34,7 +34,7 @@ const VideoGrid = (props) => {
         <div className="room-container">
             <div>
                 <Tooltip disableFocusListener title={myName} arrow>
-                    <video className="my-stream" poster="../../../style/user.png" muted ref={userVideo} autoPlay playsInline />
+                    <video className="my-stream" muted ref={userVideo} autoPlay playsInline />
                 </Tooltip>
             </div>
 
