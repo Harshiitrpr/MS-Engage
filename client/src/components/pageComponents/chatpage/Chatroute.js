@@ -55,7 +55,7 @@ const ChatRoute = (props) => {
     <div className="whole-screen">
     <div className="chat-room mt-3">
             <header className="chat-room-header">
-                <h1 className="room-id">{roomID}</h1>
+                <h3 className="room-id">{roomID}</h3>
                 <Button className="home-button"  variant="outline-secondary"  onClick={handleExit}>Home</Button>
             </header>
             <div className="chat-room-main">
