@@ -37,8 +37,8 @@ const FootConfigurationBar = (props) => {
     // toggle hostedwebsite to localhost while running on local device.
     const shareScreen = () => {
         if(myVideo === "Camera"){
-            // const hostedWebsite = "https://radiant-chamber-36927.herokuapp.com/";
-            const hostedWebsite = "http://localhost:3000/";
+            const hostedWebsite = "https://radiant-chamber-36927.herokuapp.com/";
+            // const hostedWebsite = "http://localhost:3000/";
             const url = hostedWebsite + "room/" + roomID;
             localStorage.setItem("sharescreen", true);
             localStorage.setItem("myName", myName);
