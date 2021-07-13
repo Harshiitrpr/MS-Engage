@@ -5,6 +5,9 @@ import { useHistory } from "react-router-dom"
 //for unique ids
 import { v1 as uuid } from "uuid";
 
+// copy module
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 const Dashboard = () => {
     const [error, setError] = useState("")
     const { currentUser, logout } = useAuth()
@@ -14,10 +17,10 @@ const Dashboard = () => {
     const chatRef = useRef();
     const nameRef = useRef();
 
-    const create = () => {
-        const id = uuid();
-        history.push(`/room/${id}`);
-    }
+    // const create = () => {
+    //     const id = uuid();
+    //     history.push(`/room/${id}`);
+    // }
 
     const handleLogout = async() => {
         setError("")
@@ -36,11 +39,11 @@ const Dashboard = () => {
 
     const joinChat = () =>{
         const data = {
-        myName: nameRef.current.value
+            myName: nameRef.current.value
         }
         history.push({
-        pathname: `/chat/${chatRef.current.value}`,
-        state: data,
+            pathname: `/chat/${chatRef.current.value}`,
+            state: data,
         });
     }
 
@@ -57,7 +60,9 @@ const Dashboard = () => {
                     <div className="text-center">
                         <strong>Email:</strong> {currentUser.email}
                     </div>
-                    <Button className="mt-auto w-100" onClick={create}>Create room</Button>
+                    <CopyToClipboard text={uuid()} >
+                        <Button className="mt-auto w-100">Create and roomID</Button>
+                    </CopyToClipboard>
                 </Card.Body>
             </Card>
         <Card>
