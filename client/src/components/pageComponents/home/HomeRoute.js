@@ -61,7 +61,7 @@ const Dashboard = () => {
                         <strong>Email:</strong> {currentUser.email}
                     </div>
                     <CopyToClipboard text={uuid()} >
-                        <Button className="mt-auto w-100">Create and roomID</Button>
+                        <Button className="mt-auto w-100">Create roomID</Button>
                     </CopyToClipboard>
                 </Card.Body>
             </Card>
